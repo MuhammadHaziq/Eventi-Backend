@@ -45,7 +45,7 @@ module.exports = {
 
     deletedProduct:async (body)=> {
         const {user_id, product_id} = body;
-        const product = await Product.update({_id:product_id, deleted_by:user_id, deleted_at:new Date()});
+        const product = await Product.findOneAndUpdate({_id:product_id, deleted_by:user_id, deleted_at:new Date()});
         return product;
     }, 
 
