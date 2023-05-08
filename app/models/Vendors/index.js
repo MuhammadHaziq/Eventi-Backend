@@ -8,8 +8,10 @@ const VendorSchema = new Schema(
         first_name: { type: String, required: true, trim: true },
         last_name: { type: String, required: true, trim: true },
         email: { type: String, trim: true },
-        address: { type: String, trim: true },
+        address: { type: String, trim: true, unique:true },
+        phone_number: { type: String, trim: true, required:true },
         date_of_birth:{ type: String, trim: true },
+        gender: { type: String, enum: ['Male', 'Female', 'Other'], required:true },
         deleted_by:{type: Schema.Types.ObjectId, ref: 'User', default:null},
         deleted_at:{ type: Date, default: null}
     },

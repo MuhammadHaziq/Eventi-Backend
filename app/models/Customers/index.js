@@ -7,7 +7,7 @@ const CustomerSchema = new Schema(
         first_name: { type: String, required: true, trim: true, index: true },
         last_name: { type: String, required: true, trim: true },
         business_name: { type: String, required: false, trim: true, default:null },
-        email: { type: String, trim: true },
+        email: { type: String, trim: true, unique:true },
         address: { type: String, trim: true },
         age_verification: { type: String, trim: true, default:null },
         phone_number: { type: String, trim: true, required:true },

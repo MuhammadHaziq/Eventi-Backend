@@ -29,7 +29,7 @@ module.exports = {
         try{
             const body = {...req.body, ...req.params};
             const product = await productService.getProduct(body);
-            if(product) helper.apiResponse(res, false, "Product Fetch Successfully", products);
+            if(product) helper.apiResponse(res, false, "Product Fetch Successfully", product);
             helper.apiResponse(res, true, "Product Not Fetch Successfully", null);
         }catch(err){
             const statusCode = err.status || 'INTERNAL_SERVER_ERROR';
@@ -49,10 +49,10 @@ module.exports = {
         }
     },
 
-    deletedProduct:async(req, res) => {
+    deleteProduct:async(req, res) => {
         try{
             const body = {...req.body, ...req.params};
-            const deletedProduct = await productService.deletedProduct(body);
+            const deletedProduct = await productService.deleteProduct(body);
             if(deletedProduct) helper.apiResponse(res, false, "Product Deleted Successfully", deletedProduct);
             helper.apiResponse(res, true, "Product Not Deleted Successfully", null);
         }catch(err){

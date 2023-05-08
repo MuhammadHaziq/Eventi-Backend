@@ -21,7 +21,7 @@ module.exports = {
 
     getProducts:async (body)=> {
         const {user_id} = body;
-        const allProducts = await Product.find({created_by:user_id, deleted_at:null});
+        const allProducts = await Product.find({created_by:user_id, deleted_at:null}).sort({ createdAt: -1 });
         return allProducts;
     },
 
@@ -37,13 +37,12 @@ module.exports = {
             product_name,
             product_price,
             product_quantity,
-            created_by:user_id,
             updated_by:user_id,
         }, { new: true }).lean();
         return updatedProduct;
     },
 
-    deletedProduct:async (body)=> {
+    deleteProduct:async (body)=> {
         const {user_id, product_id} = body;
         const product = await Product.findOneAndUpdate({_id:product_id, deleted_by:user_id, deleted_at:new Date()});
         return product;
