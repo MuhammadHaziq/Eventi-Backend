@@ -21,15 +21,14 @@ module.exports = {
 
     getProducts:async (body)=> {
         const {user_id} = body;
-        const allProducts = await Product.find({created_by:user_id, deleted_at:null}).sort({ createdAt: -1 });
-        return allProducts;
+        return await Product.find({created_by:user_id, deleted_at:null}).sort({ createdAt: -1 }).lean();
+        
     },
 
     getProduct:async (body)=> {
         const {user_id, product_id} = body;
-        const product = await Product.find({_id:product_id, created_by:user_id, deleted_at:null});
-        return product;
-    }, 
+        return await Product.find({_id:product_id, created_by:user_id, deleted_at:null}).lean();
+        }, 
 
     updateProduct:async (body) => {
         const {product_name, product_price, product_quantity, user_id, product_id} = body;
@@ -44,8 +43,7 @@ module.exports = {
 
     deleteProduct:async (body)=> {
         const {user_id, product_id} = body;
-        const product = await Product.findOneAndUpdate({_id:product_id, deleted_by:user_id, deleted_at:new Date()});
-        return product;
+        return await Product.findOneAndUpdate({_id:product_id, deleted_by:user_id, deleted_at:new Date()}).lean();
     }, 
 
 }

@@ -32,12 +32,12 @@ module.exports = {
     },
 
     getCustomers:async()=> {
-        return await Customer.find({deleted_by:null}).sort({createdAt:-1})
+        return await Customer.find({deleted_by:null}).sort({createdAt:-1}).lean()
     },
 
     getCustomer:async(body)=> {
         const {userId} = body;
-        return await Customer.find({user_id:userId, deleted_by:null})
+        return await Customer.find({user_id:userId, deleted_by:null}).lean()
     },
 
     updateCustomer:async(body) => {
@@ -45,7 +45,7 @@ module.exports = {
         await User.findOneAndUpdate({_id:userId},{
             first_name:first_name,
             last_name:last_name,
-        });
+        }).lean();
 
        return await Customer.findOneAndUpdate({user_id:userId},{
         first_name, last_name, business_name, email, address, age_verification, phone_number, gender, date_of_birth
@@ -55,6 +55,6 @@ module.exports = {
     deleteCustomer:async(body)=> {
         const {userId} = body;
         await User.findOneAndUpdate({_id:userId, deleted_by:null}, {deleted_by:userId});
-        await Customer.findOneAndUpdate({user_id:userId, deleted_by:null}, {deleted_by:userId});
+      return await Customer.findOneAndUpdate({user_id:userId, deleted_by:null}, {deleted_by:userId}).lean();
     }
 }

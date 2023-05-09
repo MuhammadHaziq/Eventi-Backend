@@ -17,6 +17,11 @@ app.use(cors({
     origin: '*'
 }));
 
+require("./bootstrapApplication").bootstrap(app);
+app.get('/', function (req, res, next) {
+  res.send("HELLO WORD")
+});
+
 // listen for requests
 var port = process.env.PORT || 3012;
 app.listen(port, () => {

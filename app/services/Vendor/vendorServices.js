@@ -32,12 +32,12 @@ module.exports = {
     },
 
     getVendors:async()=> {
-        return await Vendor.find({deleted_by:null}).sort({createdAt:-1})
+        return await Vendor.find({deleted_by:null}).sort({createdAt:-1}).lean();
     },
 
     getVendor:async(body)=> {
         const {userId} = body;
-        return await Vendor.find({user_id:userId, deleted_by:null})
+        return await Vendor.find({user_id:userId, deleted_by:null}).lean();
     },
 
     updateVendor:async(body) => {
@@ -53,6 +53,6 @@ module.exports = {
     deleteVendor:async(body)=> {
         const {userId} = body;
         await User.findOneAndUpdate({_id:userId, deleted_by:null}, {deleted_by:userId});
-        await Vendor.findOneAndUpdate({user_id:userId, deleted_by:null}, {deleted_by:userId});
+       return await Vendor.findOneAndUpdate({user_id:userId, deleted_by:null}, {deleted_by:userId}).lean();
     }
 }

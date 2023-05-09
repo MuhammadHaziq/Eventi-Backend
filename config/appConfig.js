@@ -1,4 +1,4 @@
-export default {
+module.exports = {
     PORT: process.env.PORT || 9000,
     STATUS_CODES: {
         INTERNAL_SERVER_ERROR: 500,

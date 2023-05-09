@@ -1,5 +1,5 @@
-import appConfig from '../../config/appConfig';
-import jwt from 'jsonwebtoken';
+const appConfig = require('../../config/appConfig');
+const jwt = require('jsonwebtoken');
 
 const createJWT = async (payload, user, expiresIn) => {
     payload = payload || null;
@@ -18,7 +18,7 @@ const createJWT = async (payload, user, expiresIn) => {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 userName: user.userName,
-                role: role ? role.name : null,
+                user_type: user_type ?? '',
             }
         };
     }
@@ -35,7 +35,7 @@ const verifyJWT = async (token) => {
 const decodeJWT = async (token) => {
     return jwt.decode(token);
 };
-export default {
+module.exports = {
     createJWT,
     verifyJWT,
     decodeJWT
