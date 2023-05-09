@@ -17,17 +17,16 @@ module.exports = {
             password:password,
             user_type:user_type || "vendor"
         });
-       await addUser.save(async function(err, newUser) {
-            if (err) {
-                error.status = 'VALIDATION_ERR';
-                error.message = `User Not Created (${err.message})`;
-                throw error
-            }
-            /** Add Vendor In Vendor Schema*/
+       await addUser.save(async newUser => {
+             /** Add Vendor In Vendor Schema*/
             const addVendor = new Vendor({
                 user_id:newUser._id, business_name, first_name, last_name, email, address, phone_number, date_of_birth, gender
             });
             return await addVendor.save()
+          }).catch(err=> {
+            error.status = 'VALIDATION_ERR';
+            error.message = `User Not Created (${err.message})`;
+            throw error
           });
     },
 
