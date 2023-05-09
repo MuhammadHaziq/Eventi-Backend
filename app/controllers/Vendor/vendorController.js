@@ -5,8 +5,8 @@ module.exports = {
         try{
             const body = {...req.body, ...req.params};
             const newVendor = await vendorService.addVendor(body);
-            if(newVendor) helper.apiResponse(res, false, "Vendor Created Successfully", newVendor);
-            helper.apiResponse(res, true, "Vendor Not Created Successfully", null);
+            if(newVendor) return helper.apiResponse(res, false, "Vendor Created Successfully", newVendor);
+            return helper.apiResponse(res, true, "Vendor Not Created Successfully", null);
         }catch(err){
             const statusCode = err.status || 'INTERNAL_SERVER_ERROR';
             return helper.apiResponse(res, true, err.message, null, statusCode);
@@ -17,8 +17,8 @@ module.exports = {
         try{
             const body = {...req.body, ...req.params};
             const vendors = await vendorService.getVendors(body);
-            if(vendors) helper.apiResponse(res, false, "Vendors Fetch Successfully", vendors);
-            helper.apiResponse(res, true, "Vendors Not Fetch Successfully", null);
+            if(vendors) return helper.apiResponse(res, false, "Vendors Fetch Successfully", vendors);
+            return helper.apiResponse(res, true, "Vendors Not Fetch Successfully", null);
         }catch(err){
             const statusCode = err.status || 'INTERNAL_SERVER_ERROR';
             return helper.apiResponse(res, true, err.message, null, statusCode);
@@ -29,8 +29,8 @@ module.exports = {
         try{
             const body = {...req.body, ...req.params};
             const vendor = await vendorService.getVendor(body);
-            if(vendor) helper.apiResponse(res, false, "Vendor Fetch Successfully", vendor);
-            helper.apiResponse(res, true, "Vendor Not Fetch Successfully", null);
+            if(vendor) return helper.apiResponse(res, false, "Vendor Fetch Successfully", vendor);
+            return helper.apiResponse(res, true, "Vendor Not Fetch Successfully", null);
         }catch(err){
             const statusCode = err.status || 'INTERNAL_SERVER_ERROR';
             return helper.apiResponse(res, true, err.message, null, statusCode);
@@ -41,8 +41,8 @@ module.exports = {
         try{
             const body = {...req.body, ...req.params};
             const updatedVendor = await vendorService.updateVendor(body);
-            if(updatedVendor) helper.apiResponse(res, false, "Vednor Updated Successfully", updatedVendor);
-            helper.apiResponse(res, true, "Vednor Not Updated Successfully", null);
+            if(updatedVendor) return helper.apiResponse(res, false, "Vednor Updated Successfully", updatedVendor);
+            return helper.apiResponse(res, true, "Vednor Not Updated Successfully", null);
         }catch(err){
             const statusCode = err.status || 'INTERNAL_SERVER_ERROR';
             return helper.apiResponse(res, true, err.message, null, statusCode);
@@ -53,8 +53,8 @@ module.exports = {
         try{
             const body = {...req.body, ...req.params};
             const deletedVendor = await vendorService.deleteVendor(body);
-            if(deletedVendor) helper.apiResponse(res, false, "Vednor Deleted Successfully", deletedVendor);
-            helper.apiResponse(res, true, "Vednor Not Deleted Successfully", null);
+            if(deletedVendor) return helper.apiResponse(res, false, "Vednor Deleted Successfully", deletedVendor);
+            return helper.apiResponse(res, true, "Vednor Not Deleted Successfully", null);
         }catch(err){
             const statusCode = err.status || 'INTERNAL_SERVER_ERROR';
             return helper.apiResponse(res, true, err.message, null, statusCode);
