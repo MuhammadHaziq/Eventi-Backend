@@ -7,7 +7,6 @@ const ProductSchema = new Schema(
         product_price: { type: Number, required: true, trim: true },
         product_quantity: { type: Number, required: false, trim: true, default:null },
         updated_by:{type: Schema.Types.ObjectId, ref: 'User', default:null},
-        updated_at:{ type: Date, default: null},
         deleted_by:{type: Schema.Types.ObjectId, ref: 'User', default:null},
         deleted_at:{ type: Date, default: null},
         created_by:{type: Schema.Types.ObjectId, ref: 'User', required:true}

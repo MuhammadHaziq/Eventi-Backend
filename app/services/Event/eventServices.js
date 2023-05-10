@@ -7,10 +7,10 @@ error.data = null;
 
 module.exports = {
     addEvent:async(body)=> {
-        const { event_name, event_date, event_location, vendor_id, type_of_event, expected_attendence, phone_number, equipments, security, special_request, userId} = body;
+        const { event_name, event_date, event_location, vendor_id, type_of_event, expected_attendence, phone_number, equipments, security, special_request, user_id} = body;
         
         const addEvent = new Event({
-            created_by:userId, event_name, event_date, event_location, vendor_id, type_of_event, expected_attendence, phone_number, equipments, security, special_request
+            created_by:user_id, event_name, event_date, event_location, vendor_id, type_of_event, expected_attendence, phone_number, equipments, security, special_request
         });
         return await addEvent.save();
     },
@@ -25,12 +25,12 @@ module.exports = {
     },
 
     updateEvent:async(body) => {
-        const {eventId, userId, event_name, event_date, event_location, vendor_id, type_of_event, expected_attendence, phone_number, equipments, security, special_request} = body;
-       return await Event.findOneAndUpdate({_id:eventId, created_by:userId},{ event_name, event_date, event_location, vendor_id, type_of_event, expected_attendence, phone_number, equipments, security, special_request },{new:true}).lean();
+        const {eventId, user_id, event_name, event_date, event_location, vendor_id, type_of_event, expected_attendence, phone_number, equipments, security, special_request} = body;
+       return await Event.findOneAndUpdate({_id:eventId, created_by:user_id},{ event_name, event_date, event_location, vendor_id, type_of_event, expected_attendence, phone_number, equipments, security, special_request },{new:true}).lean();
     },
 
     deleteEvent:async(body)=> {
-        const {userId, eventId} = body;
-        return await Event.findOneAndUpdate({created_by:userId, _id:eventId, deleted_by:null}, {deleted_by:userId}).lean();
+        const {user_id, eventId} = body;
+        return await Event.findOneAndUpdate({_id:eventId}, {deleted_by:user_id, deleted_at:new Date()}).lean();
     }
 }

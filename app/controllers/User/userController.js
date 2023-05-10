@@ -27,7 +27,7 @@ module.exports = {
 
     getUsers:async(req, res) => {
         try{
-            const body = {...req.body, ...req.params};
+            const body = {...req.body, ...req.params, ...req.user};
             const users = await userService.getUsers(body);
             if(users) return helper.apiResponse(res, false, "Users Fetch Successfully", users);
             return helper.apiResponse(res, true, "Users Not Fetch Successfully", null);
@@ -39,7 +39,7 @@ module.exports = {
 
     getUser:async(req, res) => {
         try{
-            const body = {...req.body, ...req.params};
+            const body = {...req.body, ...req.params, ...req.user};
             const user = await userService.getUser(body);
             if(user) return helper.apiResponse(res, false, "User Fetch Successfully", user);
             return helper.apiResponse(res, true, "User Not Fetch Successfully", null);
@@ -51,7 +51,7 @@ module.exports = {
 
     updateUser:async(req, res) => {
         try{
-            const body = {...req.body, ...req.params};
+            const body = {...req.body, ...req.params, ...req.user};
             const updatedProduct = await userService.updateUser(body);
             if(updatedProduct) return helper.apiResponse(res, false, "User Updated Successfully", updatedProduct);
             return helper.apiResponse(res, true, "User Not Updated Successfully", null);
@@ -63,7 +63,7 @@ module.exports = {
 
     deleteUser:async(req, res) => {
         try{
-            const body = {...req.body, ...req.params};
+            const body = {...req.body, ...req.params, ...req.user};
             const deletedUser = await userService.deleteUser(body);
             if(deletedUser) return helper.apiResponse(res, false, "User Deleted Successfully", deletedUser);
             return helper.apiResponse(res, true, "User Not Deleted Successfully", null);

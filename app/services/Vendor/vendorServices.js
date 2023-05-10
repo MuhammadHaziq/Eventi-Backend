@@ -7,51 +7,77 @@ error.message = null;
 error.data = null;
 
 module.exports = {
-    addVendor:async(body)=> {
-        const { business_name, first_name, last_name, email, address, phone_number, date_of_birth, gender, user_type, password} = body;
+    // addVendor:async(body)=> {
+    //     const { business_name, first_name, last_name, email, address, phone_number, date_of_birth, gender, user_type, password} = body;
+    //     /** Add Vendor In User Schema*/
+    //     const addUser = new User({
+    //         first_name:first_name,
+    //         last_name:last_name,
+    //         email:email,
+    //         password:password,
+    //         user_type:user_type || "vendor"
+    //     });
+    //    await addUser.save(async newUser => {
+    //          /** Add Vendor In Vendor Schema*/
+    //         const addVendor = new Vendor({
+    //             user_id:newUser._id, business_name, first_name, last_name, email, address, phone_number, date_of_birth, gender
+    //         });
+    //         return await addVendor.save()
+    //       }).catch(err=> {
+    //         error.status = 'VALIDATION_ERR';
+    //         error.message = `User Not Created (${err.message})`;
+    //         throw error
+    //       });
+    // },
+
+    addVendor: async (body) => {
+        try{
+            const { business_name, first_name, last_name, email, address, phone_number, date_of_birth, gender, user_type, password } = body;
         /** Add Vendor In User Schema*/
         const addUser = new User({
-            first_name:first_name,
-            last_name:last_name,
-            email:email,
-            password:password,
-            user_type:user_type || "vendor"
+            first_name: first_name,
+            last_name: last_name,
+            email: email,
+            password: password,
+            user_type: user_type || "vendor",
+            business_name: business_name,
+            address: address, 
+            phone_number: phone_number,
+            date_of_birth: date_of_birth, 
+            gender: gender
         });
-       await addUser.save(async newUser => {
-             /** Add Vendor In Vendor Schema*/
-            const addVendor = new Vendor({
-                user_id:newUser._id, business_name, first_name, last_name, email, address, phone_number, date_of_birth, gender
-            });
-            return await addVendor.save()
-          }).catch(err=> {
+        await addUser.save();
+        return await User.findOne({email:email}).lean();
+
+        }catch(err){
             error.status = 'VALIDATION_ERR';
-            error.message = `User Not Created (${err.message})`;
+            error.message = `User Not Created (${err?.keyValue ? Object.values(err?.keyValue):err.message}) ${err?.code === 11000 ? "Already Exist" : ""}`;
             throw error
-          });
+        }
     },
 
-    getVendors:async()=> {
-        return await Vendor.find({deleted_by:null}).sort({createdAt:-1}).lean();
+    getVendors: async () => {
+        return await Vendor.find({ deleted_by: null }).sort({ createdAt: -1 }).lean();
     },
 
-    getVendor:async(body)=> {
-        const {userId} = body;
-        return await Vendor.find({user_id:userId, deleted_by:null}).lean();
+    getVendor: async (body) => {
+        const { user_id } = body;
+        return await Vendor.find({ user_id: user_id, deleted_by: null }).lean();
     },
 
-    updateVendor:async(body) => {
-        const {userId, business_name, first_name, last_name, email, address, phone_number, date_of_birth, gender} = body;
-        await User.findOneAndUpdate({_id:userId},{
-            first_name:first_name,
-            last_name:last_name,
+    updateVendor: async (body) => {
+        const { user_id, business_name, first_name, last_name, email, address, phone_number, date_of_birth, gender } = body;
+        await User.findOneAndUpdate({ _id: user_id }, {
+            first_name: first_name,
+            last_name: last_name,
         });
 
-       return await Vendor.findOneAndUpdate({user_id:userId},{ business_name, first_name, last_name, email, address, phone_number, date_of_birth, gender },{new:true}).lean();
+        return await Vendor.findOneAndUpdate({ user_id: user_id }, { business_name, first_name, last_name, email, address, phone_number, date_of_birth, gender }, { new: true }).lean();
     },
 
-    deleteVendor:async(body)=> {
-        const {userId} = body;
-        await User.findOneAndUpdate({_id:userId, deleted_by:null}, {deleted_by:userId});
-       return await Vendor.findOneAndUpdate({user_id:userId, deleted_by:null}, {deleted_by:userId}).lean();
+    deleteVendor: async (body) => {
+        const { user_id } = body;
+        await Vendor.findOneAndUpdate({user_id: user_id}, { deleted_by: null }, { deleted_by: user_id }).lean();
+        return await User.findOneAndUpdate({ _id: user_id}, {deleted_by: null }, { deleted_by: user_id });
     }
 }
