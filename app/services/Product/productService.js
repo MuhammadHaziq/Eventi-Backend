@@ -43,7 +43,7 @@ module.exports = {
 
     deleteProduct:async (body)=> {
         const {user_id, product_id} = body;
-        return await Product.findOneAndUpdate({_id:product_id, deleted_by:user_id, deleted_at:new Date()}).lean();
+        return await Product.findOneAndUpdate({_id:product_id},{deleted_by:user_id, deleted_at:new Date()}).lean();
     }, 
 
 }

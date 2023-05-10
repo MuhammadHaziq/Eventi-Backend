@@ -3,7 +3,7 @@ const productService = require("../../services/Product/productService");
 module.exports = {
     addProduct:async(req, res) => {
         try{
-            const body = {...req.body, ...req.params};
+            const body = {...req.body, ...req.params, ...req.user};
             const newProduct = await productService.addProduct(body);
             if(newProduct) return helper.apiResponse(res, false, "Product Created Successfully", newProduct);
             return helper.apiResponse(res, true, "Product Not Created Successfully", null);
@@ -15,7 +15,7 @@ module.exports = {
 
     getProducts:async(req, res) => {
         try{
-            const body = {...req.body, ...req.params};
+            const body = {...req.body, ...req.params, ...req.user};
             const products = await productService.getProducts(body);
             if(products) return helper.apiResponse(res, false, "Products Fetch Successfully", products);
             return helper.apiResponse(res, true, "Products Not Fetch Successfully", null);
@@ -27,7 +27,7 @@ module.exports = {
 
     getProduct:async(req, res) => {
         try{
-            const body = {...req.body, ...req.params};
+            const body = {...req.body, ...req.params, ...req.user};
             const product = await productService.getProduct(body);
             if(product) return helper.apiResponse(res, false, "Product Fetch Successfully", product);
             return helper.apiResponse(res, true, "Product Not Fetch Successfully", null);
@@ -39,7 +39,7 @@ module.exports = {
 
     updateProduct:async(req, res) => {
         try{
-            const body = {...req.body, ...req.params};
+            const body = {...req.body, ...req.params, ...req.user};
             const updatedProduct = await productService.updateProduct(body);
             if(updatedProduct) return helper.apiResponse(res, false, "Product Updated Successfully", updatedProduct);
             return helper.apiResponse(res, true, "Product Not Updated Successfully", null);
@@ -51,7 +51,7 @@ module.exports = {
 
     deleteProduct:async(req, res) => {
         try{
-            const body = {...req.body, ...req.params};
+            const body = {...req.body, ...req.params, ...req.user};
             const deletedProduct = await productService.deleteProduct(body);
             if(deletedProduct) return helper.apiResponse(res, false, "Product Deleted Successfully", deletedProduct);
             return helper.apiResponse(res, true, "Product Not Deleted Successfully", null);

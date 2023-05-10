@@ -9,16 +9,15 @@ const createJWT = async (payload, user, expiresIn) => {
         throw new Error('Please define payload');
     }
     if (!payload) {
-        const role = user.role;
         payload = {
-            user:
-            {
-                _id: user._id,
+            user: {
+                user_id: user.user_id,
                 email: user.email,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                userName: user.userName,
-                user_type: user_type ?? '',
+                firstName: user.first_name,
+                lastName: user.last_name,
+                business_name:user?.business_name || "",
+                user_type:user?.user_type || "",
+                age_verification:user?.age_verification || "",
             }
         };
     }

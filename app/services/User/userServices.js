@@ -11,7 +11,7 @@ error.data = null;
 module.exports = {
     login:async(body)=> {
         const {email, password} = body;
-        const selectedUser = User.findOne({email:email}).lean();
+        const selectedUser = await User.findOne({email:email}).lean();
         if(selectedUser && !selectedUser.deleted_by){
             if(helper.decrypt(selectedUser?.password) === password){               
                 const user = {
@@ -19,10 +19,11 @@ module.exports = {
                     first_name:selectedUser?.first_name || "",
                     last_name:selectedUser?.last_name || "",
                     email:selectedUser?.email || "",
+                    business_name:selectedUser?.business_name || "",
                     user_type:selectedUser?.user_type || "",
+                    age_verification:selectedUser?.age_verification || "",
                 }
-                const token = await helper.jwt.createJWT(null, user);
-                return helper.apiResponse(res, false, "User Login Successfully", token);
+                return await helper.jwt.createJWT(null, user);
             }
         
         error.status = 'UNAUTHORIZED';
@@ -50,12 +51,12 @@ module.exports = {
     },
 
     getUsers:async()=> {
-        return await Vendor.find({deleted_by:null}).select(["first_name", "last_name", "email", "user_type", "createdAt", "updatedAt", "updated_by", "deleted_at", "deleted_by"]).sort({createdAt:-1}).lean()
+        return await User.find({deleted_by:null}).select(["first_name", "last_name", "email", "user_type", "createdAt", "updatedAt", "updated_by", "deleted_at", "deleted_by"]).sort({createdAt:-1}).lean()
     },
 
     getUser:async(body)=> {
-        const {userId} = body;
-        return await Vendor.find({user_id:userId, deleted_by:null}).select(["first_name", "last_name", "email", "user_type", "createdAt", "updatedAt", "updated_by", "deleted_at", "deleted_by"]).lean()
+        const {user_id} = body;
+        return await User.find({user_id:user_id, deleted_by:null}).select(["first_name", "last_name", "email", "user_type", "createdAt", "updatedAt", "updated_by", "deleted_at", "deleted_by"]).lean()
     },
 
     updateUser:async(body) => {
