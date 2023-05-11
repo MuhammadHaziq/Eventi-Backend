@@ -19,6 +19,7 @@
             let response = await User.findOne({_id:decoded.user.user_id}).lean();
             if (response) {
                 req.user = {...response, user_id:response?._id};
+                req.user_id = response?._id
                 delete req.user?._id;
                 next();
             } else {
