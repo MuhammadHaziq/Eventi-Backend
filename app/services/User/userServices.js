@@ -8,12 +8,60 @@ error.status = 'NOT_FOUND';
 error.message = null;
 error.data = null;
 
-const select_user = ["first_name", "last_name", "email", "user_type", "business_name", "address", "phone_number", "date_of_birth", "gender", "age_verification", "createdAt", "updatedAt", "updated_by", "deleted_at", "deleted_by"]
+const select_user = ["first_name", "last_name", "email", "user_type", "createdAt", "updatedAt", "updated_by", "deleted_at", "deleted_by"]
 
 module.exports = {
     login:async(body)=> {
-        const {email, password} = body;
-        const selectedUser = await User.findOne({email:email}).lean();
+        const {email, password, user_type} = body;
+        let selectedUser = {}
+        if(user_type === "vendor"){
+            selectedUser = await User.aggregate([
+                {$match:{email:email, user_type:user_type}},
+                {$lookup:{
+                    from:"vendors",
+                    as:"vendors",
+                    localField:"vendor_id",
+                    foreignField:"_id"
+                }},
+                {$unwind:{path:"$vendors",preserveNullAndEmptyArrays:true}},
+                {$project:{
+                    user_id:"$_id",
+                    first_name:"$first_name",
+                    last_name:"$last_name",
+                    email:"$email",
+                    user_type:"$user_type",
+                    deleted_by:"$deleted_by",
+                    password:"$vendors.password",
+                    business_name:"$vendors.business_name",
+                    date_of_birth:"$vednors.date_of_birth",
+                    gender:"$vendors.gender"
+                }}
+            ])
+        }else {
+            selectedUser = await User.aggregate([
+                {$match:{email:email, user_type:user_type}},
+                {$lookup:{
+                    from:"customers",
+                    as:"customers",
+                    localField:"customer_id",
+                    foreignField:"_id"
+                }},
+                {$unwind:{path:"$customers",preserveNullAndEmptyArrays:true}},
+                {$project:{
+                    user_id:"$_id",
+                    first_name:"$first_name",
+                    last_name:"$last_name",
+                    email:"$email",
+                    user_type:"$user_type",
+                    deleted_by:"$deleted_by",
+                    password:"$customers.password",
+                    business_name:"$customers.business_name",
+                    date_of_birth:"$customers.date_of_birth",
+                    gender:"$customers.gender"
+                }}
+            ])
+        }
+        // const selectedUser = await User.findOne({email:email}).lean();
         if(selectedUser && !selectedUser.deleted_by){
             if(helper.decrypt(selectedUser?.password) === password){               
                 const user = {
@@ -21,9 +69,7 @@ module.exports = {
                     first_name:selectedUser?.first_name || "",
                     last_name:selectedUser?.last_name || "",
                     email:selectedUser?.email || "",
-                    business_name:selectedUser?.business_name || "",
                     user_type:selectedUser?.user_type || "",
-                    age_verification:selectedUser?.age_verification || "",
                 }
                 return await helper.jwt.createJWT(null, user);
             }
