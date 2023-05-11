@@ -8,6 +8,8 @@ error.status = 'NOT_FOUND';
 error.message = null;
 error.data = null;
 
+const select_user = ["first_name", "last_name", "email", "user_type", "business_name", "address", "phone_number", "date_of_birth", "gender", "age_verification", "createdAt", "updatedAt", "updated_by", "deleted_at", "deleted_by"]
+
 module.exports = {
     login:async(body)=> {
         const {email, password} = body;
@@ -37,43 +39,42 @@ module.exports = {
         
     },
 
-
     addUser:async(body)=> {
         const {user_type} = body;
         // const { business_name, first_name, last_name, email, address, phone_number, date_of_birth, gender, user_type, password, age_verification} = body;
-        if(user_type?.toLowerCase() === "vendor"){
-            /** Add Vendor In Vendor Schema*/
-            return await  vendorService.addVendor(body)
-         } else {
-              /** Add Customer In Customer Schema*/
+        if(user_type?.toLowerCase() === "customer"){
+            /** Add Customer In Customer Schema*/
          return await customerService.addCustomer(body)
+         } else {
+            /** Add Vendor In Vendor Schema*/
+            return await  vendorService.addVendor(body)  
          }
     },
 
     getUsers:async()=> {
-        return await User.find({deleted_by:null}).select(["first_name", "last_name", "email", "user_type", "createdAt", "updatedAt", "updated_by", "deleted_at", "deleted_by"]).sort({createdAt:-1}).lean()
+        return await User.find({deleted_by:null}).select(select_user).sort({createdAt:-1}).lean()
     },
 
     getUser:async(body)=> {
-        const {user_id} = body;
-        return await User.find({user_id:user_id, deleted_by:null}).select(["first_name", "last_name", "email", "user_type", "createdAt", "updatedAt", "updated_by", "deleted_at", "deleted_by"]).lean()
+        const {userId} = body;
+        return await User.find({_id:userId, deleted_by:null}).select(select_user).lean()
     },
 
     updateUser:async(body) => {
         const {user_type} = body;
-        if(user_type?.toLowerCase() === "vendor"){
-            return await vendorService.updateVendor(body)
-        }else {
+        if(user_type?.toLowerCase() === "customer"){
             return await customerService.updateCustomer(body)
+        }else {
+            return await vendorService.updateVendor(body)
         }
     },
 
     deleteUser:async(body)=> {
         const {user_type} = body;
-        if(user_type?.toLowerCase() === "vendor"){
-            return await vendorService.updateVendor(body)
+        if(user_type?.toLowerCase() === "customer"){
+            return await customerService.deleteCustomer(body)
         }else {
-            return await customerService.updateCustomer(body)
+            return await vendorService.deleteVendor(body)
         }
     }
 }

@@ -27,12 +27,12 @@ module.exports = {
 
     getProduct:async (body)=> {
         const {user_id, product_id} = body;
-        return await Product.find({_id:product_id, created_by:user_id, deleted_at:null}).lean();
+        return await Product.findOne({_id:product_id, created_by:user_id, deleted_at:null}).lean();
         }, 
 
     updateProduct:async (body) => {
         const {product_name, product_price, product_quantity, user_id, product_id} = body;
-       const updatedProduct =  await Product.findOneAndUpdate({ _id: product_id }, {
+       const updatedProduct =  await Product.findOneAndUpdate({ _id: product_id, deleted_at:null }, {
             product_name,
             product_price,
             product_quantity,
@@ -43,7 +43,7 @@ module.exports = {
 
     deleteProduct:async (body)=> {
         const {user_id, product_id} = body;
-        return await Product.findOneAndUpdate({_id:product_id},{deleted_by:user_id, deleted_at:new Date()}).lean();
+        return await Product.findOneAndUpdate({_id:product_id, deleted_at:null},{deleted_by:user_id, deleted_at:new Date()}, {new:true}).lean();
     }, 
 
 }

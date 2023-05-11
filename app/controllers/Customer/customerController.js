@@ -15,10 +15,10 @@ module.exports = {
 
     getCustomers:async(req, res) => {
         try{
-            const body = {...req.body, ...req.params};
-            const products = await customerService.getCustomers(body);
-            if(products) return helper.apiResponse(res, false, "Customers Fetch Successfully", products);
-            return helper.apiResponse(res, true, "Customers Not Fetch Successfully", null);
+            const body = {...req.body, ...req.params, user_id:req.user_id};
+            const customers = await customerService.getCustomers(body);
+            if(customers && customers?.length > 0) return helper.apiResponse(res, false, "Customers Fetch Successfully", customers);
+            return helper.apiResponse(res, true, "No Customers Found", null);
         }catch(err){
             const statusCode = err.status || 'INTERNAL_SERVER_ERROR';
             return helper.apiResponse(res, true, err.message, null, statusCode);
@@ -27,10 +27,10 @@ module.exports = {
 
     getCustomer:async(req, res) => {
         try{
-            const body = {...req.body, ...req.params};
-            const product = await customerService.getCustomer(body);
-            if(product) return helper.apiResponse(res, false, "Customer Fetch Successfully", product);
-            return helper.apiResponse(res, true, "Customer Not Fetch Successfully", null);
+            const body = {...req.body, ...req.params, user_id:req.user_id};
+            const customer = await customerService.getCustomer(body);
+            if(customer) return helper.apiResponse(res, false, "Customer Fetch Successfully", customer);
+            return helper.apiResponse(res, true, "No Customer Found", null);
         }catch(err){
             const statusCode = err.status || 'INTERNAL_SERVER_ERROR';
             return helper.apiResponse(res, true, err.message, null, statusCode);
@@ -39,10 +39,10 @@ module.exports = {
 
     updateCustomer:async(req, res) => {
         try{
-            const body = {...req.body, ...req.params};
+            const body = {...req.body, ...req.params, user_id:req.user_id};
             const updatedProduct = await customerService.updateCustomer(body);
             if(updatedProduct) return helper.apiResponse(res, false, "Customer Updated Successfully", updatedProduct);
-            return helper.apiResponse(res, true, "Customer Not Updated Successfully", null);
+            return helper.apiResponse(res, true, "No Customer Found", null);
         }catch(err){
             const statusCode = err.status || 'INTERNAL_SERVER_ERROR';
             return helper.apiResponse(res, true, err.message, null, statusCode);
@@ -51,10 +51,10 @@ module.exports = {
 
     deleteCustomer:async(req, res) => {
         try{
-            const body = {...req.body, ...req.params};
+            const body = {...req.body, ...req.params, user_id:req.user_id};
             const deletedCustomer = await customerService.deleteCustomer(body);
             if(deletedCustomer) return helper.apiResponse(res, false, "Customer Deleted Successfully", deletedCustomer);
-            return helper.apiResponse(res, true, "Customer Not Deleted Successfully", null);
+            return helper.apiResponse(res, true, "No Customer Found", null);
         }catch(err){
             const statusCode = err.status || 'INTERNAL_SERVER_ERROR';
             return helper.apiResponse(res, true, err.message, null, statusCode);

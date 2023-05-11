@@ -66,18 +66,26 @@ module.exports = {
     },
 
     updateVendor: async (body) => {
-        const { user_id, business_name, first_name, last_name, email, address, phone_number, date_of_birth, gender } = body;
-        await User.findOneAndUpdate({ _id: user_id }, {
+        const { userId, user_id, business_name, first_name, last_name, email, address, phone_number, date_of_birth, gender } = body;
+        await Vendor.findOneAndUpdate({ user_id: userId, deleted_at:null }, { business_name, first_name, last_name, email, address, phone_number, date_of_birth, gender,updated_by:user_id }, { new: true }).lean();
+        
+        return await User.findOneAndUpdate({ _id: userId, deleted_at:null  }, {
             first_name: first_name,
             last_name: last_name,
-        });
+            business_name:business_name,
+            address:address,
+            phone_number:phone_number, 
+            gender:gender, 
+            date_of_birth:date_of_birth,
+            updated_by:user_id
+        }, { new: true }).lean();
 
-        return await Vendor.findOneAndUpdate({ user_id: user_id }, { business_name, first_name, last_name, email, address, phone_number, date_of_birth, gender }, { new: true }).lean();
+         
     },
 
     deleteVendor: async (body) => {
-        const { user_id } = body;
-        await Vendor.findOneAndUpdate({user_id: user_id}, { deleted_by: null }, { deleted_by: user_id }).lean();
-        return await User.findOneAndUpdate({ _id: user_id}, {deleted_by: null }, { deleted_by: user_id });
+        const { user_id, userId } = body;
+        await Vendor.findOneAndUpdate({user_id: userId, deleted_at:null}, { deleted_by: user_id, deleted_at:new Date() }).lean();
+        return await User.findOneAndUpdate({ _id: userId, deleted_at:null}, { deleted_by: user_id, deleted_at:new Date() }, {new:true}).lean();
     }
 }

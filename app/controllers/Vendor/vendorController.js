@@ -3,7 +3,7 @@ const vendorService = require("../../services/Vendor/vendorServices");
 module.exports = {
     addVendor:async(req, res)=> {
         try{
-            const body = {...req.body, ...req.params, ...req.user};
+            const body = {...req.body, ...req.params, user_id:req.user_id};
             const newVendor = await vendorService.addVendor(body);
             if(newVendor) return helper.apiResponse(res, false, "Vendor Created Successfully", newVendor);
             return helper.apiResponse(res, true, "Vendor Not Created Successfully", null);
@@ -15,7 +15,7 @@ module.exports = {
 
     getVendors:async(req, res) => {
         try{
-            const body = {...req.body, ...req.params, ...req.user};
+            const body = {...req.body, ...req.params, user_id:req.user_id};
             const vendors = await vendorService.getVendors(body);
             if(vendors) return helper.apiResponse(res, false, "Vendors Fetch Successfully", vendors);
             return helper.apiResponse(res, true, "Vendors Not Fetch Successfully", null);
@@ -27,7 +27,7 @@ module.exports = {
 
     getVendor:async(req, res) => {
         try{
-            const body = {...req.body, ...req.params, ...req.user};
+            const body = {...req.body, ...req.params, user_id:req.user_id};
             const vendor = await vendorService.getVendor(body);
             if(vendor) return helper.apiResponse(res, false, "Vendor Fetch Successfully", vendor);
             return helper.apiResponse(res, true, "Vendor Not Fetch Successfully", null);
@@ -39,7 +39,7 @@ module.exports = {
 
     updateVendor:async(req, res) => {
         try{
-            const body = {...req.body, ...req.params, ...req.user};
+            const body = {...req.body, ...req.params, user_id:req.user_id};
             const updatedVendor = await vendorService.updateVendor(body);
             if(updatedVendor) return helper.apiResponse(res, false, "Vednor Updated Successfully", updatedVendor);
             return helper.apiResponse(res, true, "Vednor Not Updated Successfully", null);
@@ -51,7 +51,7 @@ module.exports = {
 
     deleteVendor:async(req, res) => {
         try{
-            const body = {...req.body, ...req.params, ...req.user};
+            const body = {...req.body, ...req.params, user_id:req.user_id};
             const deletedVendor = await vendorService.deleteVendor(body);
             if(deletedVendor) return helper.apiResponse(res, false, "Vednor Deleted Successfully", deletedVendor);
             return helper.apiResponse(res, true, "Vednor Not Deleted Successfully", null);

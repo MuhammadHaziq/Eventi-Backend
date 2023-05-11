@@ -63,24 +63,31 @@ module.exports = {
 
     getCustomer:async(body)=> {
         const {user_id} = body;
-        return await Customer.find({user_id:user_id, deleted_by:null}).lean()
+        return await Customer.findOne({user_id:user_id, deleted_by:null}).lean()
     },
 
     updateCustomer:async(body) => {
-        const {user_id,first_name, last_name, business_name,  address, age_verification, phone_number, gender, date_of_birth} = body;
-        await User.findOneAndUpdate({_id:user_id},{
+        const {userId, first_name, last_name, business_name,  address, age_verification, phone_number, gender, date_of_birth, user_id} = body;
+        await Customer.findOneAndUpdate({user_id:userId, deleted_at:null},{
+            first_name, last_name, business_name, address, age_verification, phone_number, gender, date_of_birth, updated_by:user_id
+            },{new:true}).lean();
+
+        return await User.findOneAndUpdate({_id:userId, deleted_at:null},{
             first_name:first_name,
             last_name:last_name,
-        }).lean();
-
-       return await Customer.findOneAndUpdate({user_id:user_id},{
-        first_name, last_name, business_name, email, address, age_verification, phone_number, gender, date_of_birth
+            business_name:business_name,
+            address:address,
+            age_verification:age_verification, 
+            phone_number:phone_number, 
+            gender:gender, 
+            date_of_birth:date_of_birth,
+            updated_by:user_id
         },{new:true}).lean();
     },
 
     deleteCustomer:async(body)=> {
-        const {user_id} = body;
-        await Customer.findOneAndUpdate({user_id:user_id}, {deleted_by:null}, {deleted_by:user_id}).lean();
-        return await User.findOneAndUpdate({_id:user_id}, {deleted_by:null}, {deleted_by:user_id});
+        const {user_id, userId} = body;
+        await Customer.findOneAndUpdate({user_id:userId, deleted_at:null}, {deleted_by:user_id, deleted_at:new Date()});
+        return await User.findOneAndUpdate({_id:userId, deleted_at:null}, {deleted_by:user_id, deleted_at:new Date()}, {new:true}).lean();
     }
 }
