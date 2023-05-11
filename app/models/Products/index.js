@@ -6,10 +6,10 @@ const ProductSchema = new Schema(
         product_name: { type: String, required: true, trim: true, index: true },
         product_price: { type: Number, required: true, trim: true },
         product_quantity: { type: Number, required: false, trim: true, default:null },
+        user_id:{type: Schema.Types.ObjectId, ref: 'User', required:true},
         updated_by:{type: Schema.Types.ObjectId, ref: 'User', default:null},
         deleted_by:{type: Schema.Types.ObjectId, ref: 'User', default:null},
-        deleted_at:{ type: Date, default: null},
-        created_by:{type: Schema.Types.ObjectId, ref: 'User', required:true}
+        deleted_at:{ type: Date, default: null}
     },
     {
         timestamps: true
