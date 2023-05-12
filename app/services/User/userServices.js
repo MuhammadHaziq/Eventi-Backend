@@ -34,7 +34,9 @@ module.exports = {
                     password:"$vendors.password",
                     business_name:"$vendors.business_name",
                     date_of_birth:"$vednors.date_of_birth",
-                    gender:"$vendors.gender"
+                    gender:"$vendors.gender",
+                    phone_number:"$phone_number",
+                    vendor_id:"$vendor_id"
                 }}
             ])
         }else {
@@ -57,20 +59,18 @@ module.exports = {
                     password:"$customers.password",
                     business_name:"$customers.business_name",
                     date_of_birth:"$customers.date_of_birth",
-                    gender:"$customers.gender"
+                    gender:"$customers.gender",
+                    phone_number:"$phone_number",
+                    customer_id:"$customer_id"
                 }}
             ])
         }
-        // const selectedUser = await User.findOne({email:email}).lean();
+
+        selectedUser = selectedUser?.[0] || "";
         if(selectedUser && !selectedUser.deleted_by){
-            if(helper.decrypt(selectedUser?.password) === password){               
-                const user = {
-                    user_id:selectedUser?._id || "",
-                    first_name:selectedUser?.first_name || "",
-                    last_name:selectedUser?.last_name || "",
-                    email:selectedUser?.email || "",
-                    user_type:selectedUser?.user_type || "",
-                }
+            if(helper.decrypt(selectedUser?.password) === password){   
+                delete selectedUser?.password;            
+                const user = { ...selectedUser};
                 return await helper.jwt.createJWT(null, user);
             }
         

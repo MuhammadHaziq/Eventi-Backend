@@ -27,7 +27,7 @@ module.exports = {
 
     getCustomer:async(req, res) => {
         try{
-            const body = {...req.body, ...req.params, user_id:req.user_id};
+            const body = {customerId:req.params.customerId};
             const customer = await customerService.getCustomer(body);
             if(customer) return helper.apiResponse(res, false, "Customer Fetch Successfully", customer);
             return helper.apiResponse(res, true, "No Customer Found", null);
