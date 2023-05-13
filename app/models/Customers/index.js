@@ -47,7 +47,7 @@ CustomerSchema.post("findOneAndUpdate", async (doc)=> {
      await User.findOneAndUpdate({email:doc.email, customer_deleted:false}, {customer_deleted:doc.deleted_at ? true :false, customer_deleted_by:doc.deleted_at ? doc._id : null,first_name:doc.first_name,
         last_name:doc.last_name,
         email:doc.email,
-        user_type:"customer",
+        user_type:doc.deleted_at && "vendor",
         phone_number:doc.phone_number,}).lean();
 });
 

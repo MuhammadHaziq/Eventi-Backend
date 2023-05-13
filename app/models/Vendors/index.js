@@ -42,7 +42,7 @@ VendorSchema.post("save", async (doc)=> {
 
 /** Delete / Update Record In User Schema */
 VendorSchema.post("findOneAndUpdate", async (doc)=> {
-    await User.findOneAndUpdate({email:doc.email, vendor_deleted:false}, {vendor_deleted:doc.deleted_at ? true :false, vendor_deleted_by:doc.deleted_at ? doc._id : null,first_name:doc.first_name, last_name:doc.last_name, email:doc.email, user_type:"vendor", phone_number:doc.phone_number,}).lean();
+    await User.findOneAndUpdate({email:doc.email, vendor_deleted:false}, {vendor_deleted:doc.deleted_at ? true :false, vendor_deleted_by:doc.deleted_at ? doc._id : null,first_name:doc.first_name, last_name:doc.last_name, email:doc.email, user_type:doc.deleted_at && "customer", phone_number:doc.phone_number,}).lean();
 });
 
 module.exports = mongoose.model('Vendor', VendorSchema);

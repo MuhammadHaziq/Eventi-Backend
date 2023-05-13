@@ -73,7 +73,7 @@ module.exports = {
                 }
             ])
         }
-
+console.log(selectedUser)
         selectedUser = selectedUser?.[0] || "";
         if (selectedUser && !selectedUser.deleted_by) {
             if (helper.decrypt(selectedUser?.password) === password) {
