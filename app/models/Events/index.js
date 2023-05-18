@@ -14,6 +14,7 @@ const EventSchema = new Schema(
         security: { type: Boolean, required:true, default:false },
         special_request:{ type: String, trim: true },
         created_by:{type: Schema.Types.ObjectId, ref: 'User', required:true},
+        updated_by:{type: Schema.Types.ObjectId, ref: 'User', default:null},
         deleted_by:{type: Schema.Types.ObjectId, ref: 'User', default:null},
         deleted_at:{ type: Date, default: null}
     },

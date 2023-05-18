@@ -1,4 +1,5 @@
 const Event = require("../../models/Events");
+const ObjectId = require("mongoose").Types.ObjectId;
 
 const error = new Error();
 error.status = 'NOT_FOUND';
@@ -21,16 +22,17 @@ module.exports = {
 
     getEvent:async(body)=> {
         const {eventId} = body;
-        return await Event.find({_id:eventId, deleted_by:null}).lean()
+        return await Event.findOne({_id:new ObjectId(eventId), deleted_by:null}).lean()
     },
 
     updateEvent:async(body) => {
         const {eventId, user_id, event_name, event_date, event_location, vendor_id, type_of_event, expected_attendence, phone_number, equipments, security, special_request} = body;
-       return await Event.findOneAndUpdate({_id:eventId, created_by:user_id},{ event_name, event_date, event_location, vendor_id, type_of_event, expected_attendence, phone_number, equipments, security, special_request },{new:true}).lean();
+        console.log(eventId, "eventId")
+       return await Event.findOneAndUpdate({_id:eventId},{ event_name, event_date, event_location, vendor_id, type_of_event, expected_attendence, phone_number, equipments, security, special_request, updated_by:user_id },{new:true}).lean();
     },
 
     deleteEvent:async(body)=> {
         const {user_id, eventId} = body;
-        return await Event.findOneAndUpdate({_id:eventId}, {deleted_by:user_id, deleted_at:new Date()}).lean();
+        return await Event.findOneAndUpdate({_id:new ObjectId(eventId), deleted_by:null}, {deleted_by:user_id, deleted_at:new Date()}).lean();
     }
 }

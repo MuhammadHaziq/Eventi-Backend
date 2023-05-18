@@ -41,7 +41,7 @@ module.exports = {
         try{
             const body = {...req.body, ...req.params, user_id:req.user_id};
             const user = await userService.getUser(body);
-            if(user) return helper.apiResponse(res, false, "User Fetch Successfully", user);
+            if(user && user?.length >0) return helper.apiResponse(res, false, "User Fetch Successfully", user);
             return helper.apiResponse(res, true, "User Not Fetch Successfully", null);
         }catch(err){
             const statusCode = err.status || 'INTERNAL_SERVER_ERROR';
@@ -54,7 +54,7 @@ module.exports = {
             const body = {...req.body, ...req.params, user_id:req.user_id};
             const updatedProduct = await userService.updateUser(body);
             if(updatedProduct) return helper.apiResponse(res, false, "User Updated Successfully", updatedProduct);
-            return helper.apiResponse(res, true, "User Not Updated Successfully", null);
+            return helper.apiResponse(res, true, "User Not Found", null);
         }catch(err){
             const statusCode = err.status || 'INTERNAL_SERVER_ERROR';
             return helper.apiResponse(res, true, err.message, null, statusCode);
@@ -66,7 +66,7 @@ module.exports = {
             const body = {...req.body, ...req.params, user_id:req.user_id};
             const deletedUser = await userService.deleteUser(body);
             if(deletedUser) return helper.apiResponse(res, false, "User Deleted Successfully", deletedUser);
-            return helper.apiResponse(res, true, "User Not Deleted Successfully", null);
+            return helper.apiResponse(res, true, "User Not Found", null);
         }catch(err){
             const statusCode = err.status || 'INTERNAL_SERVER_ERROR';
             return helper.apiResponse(res, true, err.message, null, statusCode);

@@ -5,9 +5,9 @@ const authMiddleware = require("../../middleware/authMiddleware");
 
 router.route("/").post(customerController.addCustomer);
 router.route("/").get(authMiddleware, customerController.getCustomers);
-router.route("/:userId").get(authMiddleware, customerController.getCustomer);
-router.route("/:userId").put(authMiddleware, customerController.updateCustomer);
-router.route("/:userId").delete(authMiddleware, customerController.deleteCustomer);
+router.route("/:customerId").get(authMiddleware, customerController.getCustomer);
+router.route("/:customerId").put(authMiddleware, customerController.updateCustomer);
+router.route("/:customerId").delete(authMiddleware, customerController.deleteCustomer);
 
 module.exports = {
     router:router,
