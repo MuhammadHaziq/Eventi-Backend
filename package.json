@@ -4,7 +4,7 @@
   "description": "Event Management System",
   "main": "index.js",
   "scripts": {
-    "start":"nodemon index.js",
+    "start": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Muhammad Haziq / Haseeb Tanveer",
