@@ -5,6 +5,7 @@ const error = new Error();
 error.status = "NOT_FOUND";
 error.message = null;
 error.data = null;
+
 const productFilters = (filters, user_id) => {
   if (filters) {
     if (filters.product_name) {
