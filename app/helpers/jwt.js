@@ -15,7 +15,6 @@ const createJWT = async (payload, user, expiresIn) => {
       },
     };
   }
-  console.log(user);
   return jwt.sign(payload, appConfig.SECRET, {
     expiresIn: expiresIn,
   });

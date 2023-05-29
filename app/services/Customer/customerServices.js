@@ -1,5 +1,5 @@
 const Customer = require("../../models/Customers");
-const User = require("../../models/Users");
+const Account = require("../../models/Accounts");
 
 const error = new Error();
 error.status = "NOT_FOUND";
@@ -94,9 +94,11 @@ const customerService = {
         date_of_birth,
         user_type,
         password,
+        account_id,
       } = body;
       /** Add Customer In Customer Schema*/
       const addCustomer = new Customer({
+        account_id: account_id,
         first_name: first_name,
         last_name: last_name,
         email: email,
@@ -110,7 +112,7 @@ const customerService = {
         date_of_birth: date_of_birth,
       });
       await addCustomer.save();
-      return await User.findOne({ email: email }).lean();
+      return await Account.findOne({ email: email }).lean();
     } catch (err) {
       error.status = "VALIDATION_ERR";
       error.message = `Customer Not Created (${
@@ -189,6 +191,10 @@ const customerService = {
       ).lean();
     }
     return false;
+  },
+
+  checkCustomer: async (email) => {
+    return await Customer.findOne({ email: email }).count();
   },
 };
 module.exports = customerService;

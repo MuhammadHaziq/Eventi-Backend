@@ -1,5 +1,5 @@
 const Vendor = require("../../models/Vendors");
-const User = require("../../models/Users");
+const Account = require("../../models/Accounts");
 
 const error = new Error();
 error.status = "NOT_FOUND";
@@ -93,9 +93,11 @@ module.exports = {
         gender,
         user_type,
         password,
+        account_id,
       } = body;
       /** Add Vendor In Schema*/
       const addVendor = new Vendor({
+        account_id: account_id,
         first_name: first_name,
         last_name: last_name,
         email: email,
@@ -108,10 +110,10 @@ module.exports = {
         gender: gender,
       });
       await addVendor.save();
-      return await User.findOne({ email: email }).lean();
+      return await Account.findOne({ email: email }).lean();
     } catch (err) {
       error.status = "VALIDATION_ERR";
-      error.message = `User Not Created (${
+      error.message = `Account Not Created (${
         err?.keyValue ? Object.values(err?.keyValue) : err.message
       }) ${err?.code === 11000 ? "Already Exist" : ""}`;
       throw error;
@@ -179,5 +181,9 @@ module.exports = {
       { deleted_by: user_id, deleted_at: new Date() },
       { new: true }
     ).lean();
+  },
+
+  checkVendor: async (email) => {
+    return await Vendor.findOne({ email: email }).count();
   },
 };
