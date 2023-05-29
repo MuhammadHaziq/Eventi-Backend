@@ -12,6 +12,7 @@ const vendorNav = [
   { permission: "vendor-edit" },
   { permission: "event-list" },
   { permission: "event-join" },
+  { permission: "event-add" },
   { permission: "product-list" },
   { permission: "product-add" },
   { permission: "product-edit" },
