@@ -6,13 +6,13 @@ const authMiddleware = require("../../middleware/authMiddleware");
 router.route("/").post(customerController.addCustomer);
 router.route("/").get(authMiddleware, customerController.getCustomers);
 router
-  .route("/:customerId")
+  .route("/:account_id")
   .get(authMiddleware, customerController.getCustomer);
 router
-  .route("/:customerId")
+  .route("/:account_id")
   .put(authMiddleware, customerController.updateCustomer);
 router
-  .route("/:customerId")
+  .route("/:account_id")
   .delete(authMiddleware, customerController.deleteCustomer);
 
 module.exports = {

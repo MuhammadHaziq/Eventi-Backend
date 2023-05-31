@@ -113,7 +113,6 @@ module.exports = {
       security,
       special_request,
     } = body;
-    console.log(eventId, "eventId");
     return await Event.findOneAndUpdate(
       { _id: eventId },
       {

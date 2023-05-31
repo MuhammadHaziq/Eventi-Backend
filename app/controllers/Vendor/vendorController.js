@@ -3,7 +3,7 @@ const vendorService = require("../../services/Vendor/vendorServices");
 module.exports = {
   addVendor: async (req, res) => {
     try {
-      const body = { ...req.body, ...req.params, user_id: req.user_id };
+      const body = { ...req.body, ...req.params };
       const newVendor = await vendorService.addVendor(body);
       if (newVendor)
         return helper.apiResponse(
@@ -30,7 +30,6 @@ module.exports = {
         ...req.body,
         ...req.params,
         ...req.query,
-        user_id: req.user_id,
       };
       const vendors = await vendorService.getVendors(body);
       if (vendors)
@@ -54,7 +53,7 @@ module.exports = {
 
   getVendor: async (req, res) => {
     try {
-      const body = { ...req.body, ...req.params, user_id: req.user_id };
+      const body = { ...req.body, ...req.params, authAccount: req.account_id };
       const vendor = await vendorService.getVendor(body);
       if (vendor)
         return helper.apiResponse(
@@ -77,7 +76,7 @@ module.exports = {
 
   updateVendor: async (req, res) => {
     try {
-      const body = { ...req.body, ...req.params, user_id: req.user_id };
+      const body = { ...req.body, ...req.params, authAccount: req.account_id };
       const updatedVendor = await vendorService.updateVendor(body);
       if (updatedVendor)
         return helper.apiResponse(
@@ -100,7 +99,7 @@ module.exports = {
 
   deleteVendor: async (req, res) => {
     try {
-      const body = { ...req.body, ...req.params, user_id: req.user_id };
+      const body = { ...req.body, ...req.params, authAccount: req.account_id };
       const deletedVendor = await vendorService.deleteVendor(body);
       if (deletedVendor)
         return helper.apiResponse(

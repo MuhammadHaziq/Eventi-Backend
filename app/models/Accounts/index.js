@@ -30,14 +30,21 @@ const AccountSchema = new Schema(
 // When you `populate()` the `author` virtual, Mongoose will find the
 // first document in the User model whose `_id` matches this document's
 // `authorId` property.
-// AccountSchema.virtual("user_detail", {
-//   ref: (doc) => {
-//     console.log(doc);
-//     return doc?.userRef;
-//   },
-//   localField: "_id",
-//   foreignField: "account_id",
-//   justOne: true,
-// });
+AccountSchema.virtual("user_detail", {
+  ref: (doc) => {
+    return doc?.userRef;
+  },
+  localField: "_id",
+  foreignField: "account_id",
+  justOne: true,
+});
+
+AccountSchema.pre("find", function () {
+  this.populate("user_detail");
+});
+
+AccountSchema.pre("findOne", function () {
+  this.populate("user_detail");
+});
 
 module.exports = mongoose.model("Account", AccountSchema);

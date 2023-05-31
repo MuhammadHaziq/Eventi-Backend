@@ -1,5 +1,6 @@
 const Vendor = require("../../models/Vendors");
 const Account = require("../../models/Accounts");
+const ObjectId = require("mongoose").Types.ObjectId;
 
 const error = new Error();
 error.status = "NOT_FOUND";
@@ -63,6 +64,7 @@ const vendorFilters = (filters) => {
 };
 
 const select = [
+  "account_id",
   "first_name",
   "last_name",
   "email",
@@ -138,16 +140,19 @@ module.exports = {
   },
 
   getVendor: async (body) => {
-    const { vendorId } = body;
-    return await Vendor.findOne({ _id: vendorId, deleted_by: null })
+    const { account_id } = body;
+    return await Vendor.findOne({
+      account_id: new ObjectId(account_id),
+      deleted_by: null,
+    })
       .select(select)
       .lean();
   },
 
   updateVendor: async (body) => {
     const {
-      vendorId,
-      user_id,
+      account_id,
+      authAccount,
       business_name,
       first_name,
       last_name,
@@ -157,8 +162,15 @@ module.exports = {
       date_of_birth,
       gender,
     } = body;
+    await Account.updateOne(
+      {
+        _id: new ObjectId(account_id),
+        deleted_at: { $eq: null },
+      },
+      { first_name, last_name, phone_number, updated_by: authAccount }
+    );
     return await Vendor.findOneAndUpdate(
-      { _id: vendorId, deleted_at: null },
+      { account_id: new ObjectId(account_id), deleted_at: { $eq: null } },
       {
         business_name,
         first_name,
@@ -168,17 +180,24 @@ module.exports = {
         phone_number,
         date_of_birth,
         gender,
-        updated_by: user_id,
+        updated_by: authAccount,
       },
       { new: true }
     ).lean();
   },
 
   deleteVendor: async (body) => {
-    const { user_id, vendorId } = body;
+    const { authAccount, account_id } = body;
+    await Account.updateOne(
+      {
+        _id: new ObjectId(account_id),
+        deleted_at: { $eq: null },
+      },
+      { deleted_by: authAccount, deleted_at: new Date() }
+    );
     return await Vendor.findOneAndUpdate(
-      { _id: vendorId, deleted_at: null },
-      { deleted_by: user_id, deleted_at: new Date() },
+      { account_id: new ObjectId(account_id), deleted_at: { $eq: null } },
+      { deleted_by: authAccount, deleted_at: new Date() },
       { new: true }
     ).lean();
   },

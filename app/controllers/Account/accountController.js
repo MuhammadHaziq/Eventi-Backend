@@ -1,10 +1,10 @@
-const userService = require("../../services/Account/accountServices");
+const accountService = require("../../services/Account/accountServices");
 
 module.exports = {
   login: async (req, res) => {
     try {
       const body = { ...req.body, ...req.params };
-      const token = await userService.login(body);
+      const token = await accountService.login(body);
       if (token)
         return helper.apiResponse(res, false, "User Login Successfully", token);
       return helper.apiResponse(res, true, "User Not Login Successfully", null);
@@ -17,7 +17,7 @@ module.exports = {
   addUser: async (req, res) => {
     try {
       const body = { ...req.body, ...req.params };
-      const newUser = await userService.addUser(body);
+      const newUser = await accountService.addUser(body);
       if (newUser)
         return helper.apiResponse(
           res,
@@ -39,8 +39,8 @@ module.exports = {
 
   getUsers: async (req, res) => {
     try {
-      const body = { ...req.body, ...req.params, account_id: req.account_id };
-      const users = await userService.getUsers(body);
+      const body = { ...req.body, ...req.params, authAccount: req.account_id };
+      const users = await accountService.getUsers(body);
       if (users && users?.length > 0)
         return helper.apiResponse(
           res,
@@ -62,8 +62,8 @@ module.exports = {
 
   getUser: async (req, res) => {
     try {
-      const body = { ...req.body, ...req.params, account_id: req.account_id };
-      const user = await userService.getUser(body);
+      const body = { ...req.body, ...req.params };
+      const user = await accountService.getUser(body);
       if (user)
         return helper.apiResponse(res, false, "User Fetch Successfully", user);
       return helper.apiResponse(res, true, "User Not Fetch Successfully", null);
@@ -75,8 +75,8 @@ module.exports = {
 
   updateUser: async (req, res) => {
     try {
-      const body = { ...req.body, ...req.params, account_id: req.account_id };
-      const updatedProduct = await userService.updateUser(body);
+      const body = { ...req.body, ...req.params, authAccount: req.account_id };
+      const updatedProduct = await accountService.updateUser(body);
       if (updatedProduct)
         return helper.apiResponse(
           res,
@@ -94,7 +94,7 @@ module.exports = {
   deleteUser: async (req, res) => {
     try {
       const body = { ...req.body, ...req.params, account_id: req.account_id };
-      const deletedUser = await userService.deleteUser(body);
+      const deletedUser = await accountService.deleteUser(body);
       if (deletedUser)
         return helper.apiResponse(
           res,

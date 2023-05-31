@@ -1,5 +1,6 @@
 const Customer = require("../../models/Customers");
 const Account = require("../../models/Accounts");
+const ObjectId = require("mongoose").Types.ObjectId;
 
 const error = new Error();
 error.status = "NOT_FOUND";
@@ -63,6 +64,7 @@ const customerFilters = (filters) => {
 };
 
 const select = [
+  "account_id",
   "first_name",
   "last_name",
   "email",
@@ -140,15 +142,18 @@ const customerService = {
   },
 
   getCustomer: async (body) => {
-    const { customerId } = body;
-    return await Customer.findOne({ _id: customerId, deleted_by: null })
+    const { account_id } = body;
+    return await Customer.findOne({
+      account_id: new ObjectId(account_id),
+      deleted_by: { $eq: null },
+    })
       .select(select)
       .lean();
   },
 
   updateCustomer: async (body) => {
     const {
-      customerId,
+      account_id,
       first_name,
       last_name,
       business_name,
@@ -157,12 +162,19 @@ const customerService = {
       phone_number,
       gender,
       date_of_birth,
-      user_id,
+      authAccount,
     } = body;
-    const exist = await customerService.getCustomer({ customerId });
+    const exist = await customerService.getCustomer({ account_id });
     if (exist) {
+      await Account.updateOne(
+        {
+          _id: new ObjectId(account_id),
+          deleted_at: { $eq: null },
+        },
+        { first_name, last_name, phone_number, updated_by: authAccount }
+      );
       return await Customer.findOneAndUpdate(
-        { _id: customerId, deleted_at: null },
+        { account_id: new ObjectId(account_id), deleted_at: { $eq: null } },
         {
           first_name,
           last_name,
@@ -172,7 +184,7 @@ const customerService = {
           phone_number,
           gender,
           date_of_birth,
-          updated_by: user_id,
+          updated_by: authAccount,
         },
         { new: true }
       ).lean();
@@ -181,12 +193,19 @@ const customerService = {
   },
 
   deleteCustomer: async (body) => {
-    const { user_id, customerId } = body;
-    const exist = await customerService.getCustomer({ customerId });
+    const { authAccount, account_id } = body;
+    const exist = await customerService.getCustomer({ account_id });
     if (exist) {
+      await Account.updateOne(
+        {
+          _id: new ObjectId(account_id),
+          deleted_at: { $eq: null },
+        },
+        { deleted_by: authAccount, deleted_at: new Date() }
+      );
       return await Customer.findOneAndUpdate(
-        { _id: customerId, deleted_at: null },
-        { deleted_by: user_id, deleted_at: new Date() },
+        { _id: account_id, deleted_at: null },
+        { deleted_by: authAccount, deleted_at: new Date() },
         { new: true }
       ).lean();
     }

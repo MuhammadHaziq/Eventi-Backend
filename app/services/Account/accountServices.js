@@ -159,69 +159,25 @@ const accountService = {
   },
 
   getUsers: async () => {
-    return await Account.aggregate([
-      {
-        $match: { deleted_by: { $eq: null } },
-      },
-      {
-        $lookup: {
-          from: "vendors",
-          as: "vendors",
-          localField: "_id",
-          foreignField: "account_id",
-        },
-      },
-      { $unwind: { path: "$vendors", preserveNullAndEmptyArrays: true } },
-      {
-        $lookup: {
-          from: "customers",
-          as: "customers",
-          localField: "_id",
-          foreignField: "account_id",
-        },
-      },
-      { $unwind: { path: "$customers", preserveNullAndEmptyArrays: true } },
-      {
-        $project: {
-          account_id: "$_id",
-          first_name: "$first_name",
-          last_name: "$last_name",
-          email: "$email",
-          user_type: "$user_type",
-          customers: "$customers",
-          vendor: "$vendors",
-          customer_id: "$customers._id",
-          vendor_id: "$vendors._id",
-          deleted_by: "$deleted_by",
-          deleted_at: "$deleted_at",
-        },
-      },
-    ]);
+    return await Account.find({ deleted_by: { $eq: null } }).lean();
   },
 
   getUser: async (body) => {
     const { account_id } = body;
     const userType = await accountService.getUserType(account_id);
-    let lookUps = customerLookUp;
     let permission = adminNav;
     if (userType === "vendor") {
-      lookUps = vendorLookUp;
       permission = vendorNav;
     }
     if (userType === "customer") {
-      lookUps = customerLookUp;
       permission = customerNav;
     }
-    const data = await Account.aggregate([
-      {
-        $match: {
-          _id: new ObjectId(account_id),
-          user_type: userType,
-          deleted_by: { $eq: null },
-        },
-      },
-      ...lookUps,
-    ]);
+
+    const data = await Account.find({
+      _id: new ObjectId(account_id),
+      deleted_by: { $eq: null },
+    }).lean();
+
     if (data && data?.length > 0) {
       return { data, permissions: permission };
     }
@@ -229,47 +185,39 @@ const accountService = {
   },
 
   updateUser: async (body) => {
-    const { account_id, first_name, last_name, phone_number } = body;
+    const { account_id, authAccount } = body;
     const user_type = await accountService.getUserType(account_id);
-    const user = await Account.findOneAndUpdate(
-      {
-        _id: new ObjectId(account_id),
-      },
-      { first_name, last_name, phone_number },
-      { new: true }
-    ).lean();
+
     if (user_type?.toLowerCase() === "customer") {
       return await customerService.updateCustomer({
         ...body,
-        account_id: user?._id,
+        account_id: account_id,
+        authAccount: authAccount,
       });
     } else {
       return await vendorService.updateVendor({
         ...body,
-        account_id: user?._id,
+        account_id: account_id,
+        authAccount: authAccount,
       });
     }
   },
 
   deleteUser: async (body) => {
-    const { account_id } = body;
+    const { account_id, authAccount } = body;
     const user_type = await accountService.getUserType(account_id);
-    const user = await Account.findOneAndUpdate(
-      {
-        _id: new ObjectId(account_id),
-      },
-      { deleted_by: account_id, deleted_at: new Date() },
-      { new: true }
-    ).lean();
+
     if (user_type?.toLowerCase() === "customer") {
       return await customerService.deleteCustomer({
         ...body,
-        account_id: user?._id,
+        account_id: account_id,
+        authAccount: authAccount,
       });
     } else {
       return await vendorService.deleteVendor({
         ...body,
-        account_id: user?._id,
+        account_id: account_id,
+        authAccount: authAccount,
       });
     }
   },
