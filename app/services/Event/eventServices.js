@@ -167,7 +167,8 @@ module.exports = {
     const { authAccount, eventId } = body;
     return await Event.findOneAndUpdate(
       { _id: new ObjectId(eventId), deleted_by: { $eq: null } },
-      { deleted_by: authAccount, deleted_at: new Date() }
+      { deleted_by: authAccount, deleted_at: new Date() },
+      { new: true }
     ).lean();
   },
 };
