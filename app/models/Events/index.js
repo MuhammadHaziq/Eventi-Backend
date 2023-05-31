@@ -7,10 +7,11 @@ const EventSchema = new Schema(
     event_date: { type: String, required: true, default: null },
     event_location: { type: String, required: true, trim: true },
     type_of_event: { type: String, required: true, trim: true },
+    banner_images: [{ type: String, required: false, trim: true }],
     expected_attendence: { type: Number, required: true, trim: true, min: 1 },
     phone_number: { type: String, trim: true, required: true },
     equipments: { type: String, trim: true, required: true },
-    security: { type: Boolean, required: true, default: false },
+    security: { type: String, required: true, default: false },
     joined_customers: [
       {
         type: Schema.Types.ObjectId,

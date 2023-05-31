@@ -27,11 +27,11 @@ module.exports = async (req, res, next) => {
         req.user = {
           ...response,
           account_id: response?._id,
-          user_id: response?.user_id,
+          user_id: response?.user_detail?._id,
         };
-        req.user_id = response?.user_id;
+        req.user_id = response?.user_detail?._id;
         req.account_id = response?._id;
-        delete req.user?.user_id;
+        // delete req.user?.user_id;
         next();
       } else {
         return res.status(config.STATUS_CODES.UNAUTHORIZED).send({

@@ -3,7 +3,12 @@ const eventService = require("../../services/Event/eventServices");
 module.exports = {
   addEvent: async (req, res) => {
     try {
-      const body = { ...req.body, ...req.params, user_id: req.user_id };
+      const body = {
+        ...req.body,
+        ...req.params,
+        ...req,
+        authAccount: req.account_id,
+      };
       const newEvent = await eventService.addEvent(body);
       if (newEvent)
         return helper.apiResponse(
@@ -30,7 +35,7 @@ module.exports = {
         ...req.body,
         ...req.params,
         ...req.query,
-        user_id: req.user_id,
+        authAccount: req.account_id,
       };
       const events = await eventService.getEvents(body);
       if (events && events?.data?.length > 0)
@@ -54,7 +59,7 @@ module.exports = {
 
   getEvent: async (req, res) => {
     try {
-      const body = { ...req.body, ...req.params, user_id: req.user_id };
+      const body = { ...req.body, ...req.params, authAccount: req.account_id };
       const event = await eventService.getEvent(body);
       if (event)
         return helper.apiResponse(
@@ -77,7 +82,12 @@ module.exports = {
 
   updateEvent: async (req, res) => {
     try {
-      const body = { ...req.body, ...req.params, user_id: req.user_id };
+      const body = {
+        ...req.body,
+        ...req.params,
+        ...req,
+        authAccount: req.account_id,
+      };
       const updatedEvent = await eventService.updateEvent(body);
       if (updatedEvent)
         return helper.apiResponse(
@@ -100,7 +110,7 @@ module.exports = {
 
   deleteEvent: async (req, res) => {
     try {
-      const body = { ...req.body, ...req.params, user_id: req.user_id };
+      const body = { ...req.body, ...req.params, authAccount: req.account_id };
       const deletedEvent = await eventService.deleteEvent(body);
       if (deletedEvent)
         return helper.apiResponse(
