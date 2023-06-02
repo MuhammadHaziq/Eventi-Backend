@@ -14,7 +14,7 @@ const AccountSchema = new Schema(
     userRef: {
       type: String,
       required: true,
-      enum: ["Customers", "Vendors"],
+      enum: ["Customer", "Vendor"],
       default: "Admin",
     },
     phone_number: { type: String, trim: true, required: true },

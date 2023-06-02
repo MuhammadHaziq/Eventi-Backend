@@ -128,15 +128,17 @@ module.exports = {
       security,
       special_request,
     } = body;
-    let images = banner_images && JSON.parse(banner_images);
+    let images = null;
+    // banner_images && JSON.parse(banner_images);
     const bannerImages = body.files ? body.files.banner_images : null;
+
     if (bannerImages) {
       let response = await uploadImages(
         bannerImages,
         `eventImage/${authAccount}`
       );
       if (response.images.length) {
-        images = response.images;
+        images = { banner_images: response.images };
       } else {
         error.status = "BAD_REQUEST";
         error.message = response?.message;
@@ -150,7 +152,7 @@ module.exports = {
         event_name,
         event_date,
         event_location,
-        banner_images: images,
+        ...images,
         type_of_event,
         expected_attendence,
         phone_number,

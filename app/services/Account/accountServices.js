@@ -84,7 +84,7 @@ const newUser = async (body) => {
     email: body.email,
     user_type: body.user_type,
     phone_number: body.phone_number,
-    userRef: body.user_type === "vendor" ? "Vendors" : "Customers",
+    userRef: body.user_type === "vendor" ? "Vendor" : "Customer",
   });
   return await addUser.save();
 };
