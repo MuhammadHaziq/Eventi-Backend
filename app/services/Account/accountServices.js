@@ -126,16 +126,22 @@ const accountService = {
   },
 
   addUser: async (body) => {
-    const { user_type, email } = body;
+    const { email, password, user_type } = body;
     if (user_type?.toLowerCase() === "customer") {
       /** Add Customer In Customer Schema*/
       const customerExist = await customerService.checkCustomer(email);
       if (!customerExist) {
         const addedUser = await newUser(body);
-        return await customerService.addCustomer({
+        const currentUser = await customerService.addCustomer({
           ...body,
           account_id: addedUser?._id,
         });
+        const token = await accountService.login({
+          email,
+          password,
+          user_type,
+        });
+        return { ...currentUser, token };
       } else {
         error.status = "VALIDATION_ERR";
         error.message = `User Not Created (Email Already Exist)`;
@@ -146,10 +152,16 @@ const accountService = {
       const customerExist = await vendorService.checkVendor(email);
       if (!customerExist) {
         const addedUser = await newUser(body);
-        return await vendorService.addVendor({
+        const currentUser = await vendorService.addVendor({
           ...body,
           account_id: addedUser?._id,
         });
+        const token = await accountService.login({
+          email,
+          password,
+          user_type,
+        });
+        return { ...currentUser, token };
       } else {
         error.status = "VALIDATION_ERR";
         error.message = `User Not Created (Email Already Exist)`;
