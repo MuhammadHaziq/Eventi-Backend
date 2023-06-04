@@ -7,7 +7,7 @@ error.status = "NOT_FOUND";
 error.message = null;
 error.data = null;
 
-const vendorFilters = (filters) => {
+const vendorFilters = (filters, user_type, authAccount) => {
   if (filters) {
     if (filters.gender) {
       filters.gender = { $regex: filters.gender, $options: "i" };
@@ -60,7 +60,11 @@ const vendorFilters = (filters) => {
     }
   }
 
-  return { ...filters, deleted_at: null };
+  if (user_type !== "admin") {
+    filters = { account_id: authAccount };
+  }
+
+  return { ...filters, deleted_by: { $eq: null } };
 };
 
 const select = [
@@ -123,13 +127,17 @@ module.exports = {
   },
 
   getVendors: async (body) => {
-    const { perPage, page, tableFilters, sort } = body;
+    const { perPage, page, tableFilters, sort, user_type, authAccount } = body;
     const sorter = sort ? JSON.parse(sort) : null;
     const filters = tableFilters ? JSON.parse(tableFilters) : null;
     const startIndex = ((page || 1) - 1) * (perPage || 10);
-    const totalRecord = await Vendor.find(vendorFilters(filters)).count();
+    const totalRecord = await Vendor.find(
+      vendorFilters(filters, user_type, authAccount)
+    ).count();
     const tableRows = helper.pagination(totalRecord, page || 1, perPage || 10);
-    const record = await Vendor.find(vendorFilters(filters))
+    const record = await Vendor.find(
+      vendorFilters(filters, user_type, authAccount)
+    )
       .select(select)
       .sort({ [sorter?.value || "createdAt"]: sorter?.state || -1 })
       .skip(startIndex)
@@ -143,7 +151,7 @@ module.exports = {
     const { account_id } = body;
     return await Vendor.findOne({
       account_id: new ObjectId(account_id),
-      deleted_by: null,
+      deleted_by: { $eq: null },
     })
       .select(select)
       .lean();

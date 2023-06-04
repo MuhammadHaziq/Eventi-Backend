@@ -6,7 +6,7 @@ error.status = "NOT_FOUND";
 error.message = null;
 error.data = null;
 
-const productFilters = (filters, authAccount) => {
+const productFilters = (filters, user_type, authAccount) => {
   if (filters) {
     if (filters.product_name) {
       filters.product_name = { $regex: filters.product_name, $options: "i" };
@@ -21,7 +21,11 @@ const productFilters = (filters, authAccount) => {
     }
   }
 
-  return { ...filters, created_by: authAccount, deleted_at: null };
+  if (user_type !== "admin") {
+    filters = { created_by: authAccount };
+  }
+
+  return { ...filters, deleted_by: { $eq: null } };
 };
 
 module.exports = {
@@ -37,15 +41,17 @@ module.exports = {
   },
 
   getProducts: async (body) => {
-    const { authAccount, perPage, page, tableFilters, sort } = body;
+    const { authAccount, perPage, page, tableFilters, sort, user_type } = body;
     const sorter = sort ? JSON.parse(sort) : null;
     const filters = tableFilters ? JSON.parse(tableFilters) : null;
     const totalRecord = await Product.find(
-      productFilters(filters, authAccount)
+      productFilters(filters, user_type, authAccount)
     ).count();
     const startIndex = ((page || 1) - 1) * (perPage || 10);
     const tableRows = helper.pagination(totalRecord, page || 1, perPage || 10);
-    const record = await Product.find(productFilters(filters, authAccount))
+    const record = await Product.find(
+      productFilters(filters, user_type, authAccount)
+    )
       .sort({ [sorter?.value || "createdAt"]: sorter?.state || -1 })
       .skip(startIndex)
       .limit(perPage || 10)

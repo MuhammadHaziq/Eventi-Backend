@@ -30,6 +30,8 @@ module.exports = {
         ...req.body,
         ...req.params,
         ...req.query,
+        user_type: req.user.user_type,
+        authAccount: req.account_id,
       };
       const customers = await customerService.getCustomers(body);
       if (customers && customers?.data?.length > 0) {

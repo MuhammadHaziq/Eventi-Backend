@@ -30,6 +30,8 @@ module.exports = {
         ...req.body,
         ...req.params,
         ...req.query,
+        user_type: req.user.user_type,
+        authAccount: req.account_id,
       };
       const vendors = await vendorService.getVendors(body);
       if (vendors)
@@ -53,7 +55,10 @@ module.exports = {
 
   getVendor: async (req, res) => {
     try {
-      const body = { ...req.body, ...req.params, authAccount: req.account_id };
+      const body = {
+        ...req.body,
+        ...req.params,
+      };
       const vendor = await vendorService.getVendor(body);
       if (vendor)
         return helper.apiResponse(

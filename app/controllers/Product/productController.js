@@ -31,6 +31,7 @@ module.exports = {
         ...req.params,
         ...req.query,
         authAccount: req.account_id,
+        user_type: req.user.user_type,
       };
       const products = await productService.getProducts(body);
       if (products && products?.data?.length > 0)
