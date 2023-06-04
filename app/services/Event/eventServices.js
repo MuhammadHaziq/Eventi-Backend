@@ -35,8 +35,8 @@ const eventFilters = (filters, authAccount) => {
       delete filters.special_request;
     }
   }
-
-  return { ...filters, created_by: authAccount, deleted_at: null };
+  // created_by: authAccount,
+  return { ...filters, deleted_at: { $eq: null } };
 };
 
 module.exports = {
