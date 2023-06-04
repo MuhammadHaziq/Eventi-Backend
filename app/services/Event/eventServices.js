@@ -1,12 +1,12 @@
 const Event = require("../../models/Events");
 const ObjectId = require("mongoose").Types.ObjectId;
-
+const { uploadImages } = require("../../../utils/fileHandler");
 const error = new Error();
 error.status = "NOT_FOUND";
 error.message = null;
 error.data = null;
 
-const eventFilters = (filters, user_id) => {
+const eventFilters = (filters, authAccount) => {
   if (filters) {
     if (filters.event_name) {
       filters.event_name = { $regex: filters.event_name, $options: "i" };
@@ -36,7 +36,7 @@ const eventFilters = (filters, user_id) => {
     }
   }
 
-  return { ...filters, created_by: user_id, deleted_at: null };
+  return { ...filters, created_by: authAccount, deleted_at: null };
 };
 
 module.exports = {
@@ -45,22 +45,37 @@ module.exports = {
       event_name,
       event_date,
       event_location,
-      vendor_id,
+      banner_images,
       type_of_event,
       expected_attendence,
       phone_number,
       equipments,
       security,
       special_request,
-      user_id,
+      authAccount,
     } = body;
-
+    let images = null;
+    const bannerImages = body.files ? body.files.banner_images : null;
+    if (bannerImages) {
+      let response = await uploadImages(
+        bannerImages,
+        `eventImage/${authAccount}`
+      );
+      if (response.images.length) {
+        images = response.images;
+      } else {
+        error.status = "BAD_REQUEST";
+        error.message = response?.message;
+        error.data = null;
+        throw error;
+      }
+    }
     const addEvent = new Event({
-      created_by: user_id,
+      created_by: authAccount,
       event_name,
       event_date,
       event_location,
-      vendor_id,
+      banner_images: images,
       type_of_event,
       expected_attendence,
       phone_number,
@@ -72,15 +87,15 @@ module.exports = {
   },
 
   getEvents: async (body) => {
-    const { user_id, perPage, page, tableFilters, sort } = body;
+    const { authAccount, perPage, page, tableFilters, sort } = body;
     const sorter = sort ? JSON.parse(sort) : null;
     const filters = tableFilters ? JSON.parse(tableFilters) : null;
     const startIndex = ((page || 1) - 1) * (perPage || 10);
     const totalRecord = await Event.find(
-      eventFilters(filters, user_id)
+      eventFilters(filters, authAccount)
     ).count();
     const tableRows = helper.pagination(totalRecord, page || 1, perPage || 10);
-    const record = await Event.find(eventFilters(filters, user_id))
+    const record = await Event.find(eventFilters(filters, authAccount))
       .sort({ [sorter?.value || "createdAt"]: sorter?.state || -1 })
       .skip(startIndex)
       .limit(perPage || 10)
@@ -94,18 +109,18 @@ module.exports = {
 
     return await Event.findOne({
       _id: new ObjectId(eventId),
-      deleted_by: null,
+      deleted_by: { $eq: null },
     }).lean();
   },
 
   updateEvent: async (body) => {
     const {
       eventId,
-      user_id,
+      authAccount,
       event_name,
       event_date,
       event_location,
-      vendor_id,
+      banner_images,
       type_of_event,
       expected_attendence,
       phone_number,
@@ -113,31 +128,49 @@ module.exports = {
       security,
       special_request,
     } = body;
-    console.log(eventId, "eventId");
+    let images = null;
+    // banner_images && JSON.parse(banner_images);
+    const bannerImages = body.files ? body.files.banner_images : null;
+
+    if (bannerImages) {
+      let response = await uploadImages(
+        bannerImages,
+        `eventImage/${authAccount}`
+      );
+      if (response.images.length) {
+        images = { banner_images: response.images };
+      } else {
+        error.status = "BAD_REQUEST";
+        error.message = response?.message;
+        error.data = null;
+        throw error;
+      }
+    }
     return await Event.findOneAndUpdate(
       { _id: eventId },
       {
         event_name,
         event_date,
         event_location,
-        vendor_id,
+        ...images,
         type_of_event,
         expected_attendence,
         phone_number,
         equipments,
         security,
         special_request,
-        updated_by: user_id,
+        updated_by: authAccount,
       },
       { new: true }
     ).lean();
   },
 
   deleteEvent: async (body) => {
-    const { user_id, eventId } = body;
+    const { authAccount, eventId } = body;
     return await Event.findOneAndUpdate(
-      { _id: new ObjectId(eventId), deleted_by: null },
-      { deleted_by: user_id, deleted_at: new Date() }
+      { _id: new ObjectId(eventId), deleted_by: { $eq: null } },
+      { deleted_by: authAccount, deleted_at: new Date() },
+      { new: true }
     ).lean();
   },
 };

@@ -3,7 +3,7 @@ const productService = require("../../services/Product/productService");
 module.exports = {
   addProduct: async (req, res) => {
     try {
-      const body = { ...req.body, ...req.params, user_id: req.user_id };
+      const body = { ...req.body, ...req.params, authAccount: req.account_id };
       const newProduct = await productService.addProduct(body);
       if (newProduct)
         return helper.apiResponse(
@@ -30,7 +30,8 @@ module.exports = {
         ...req.body,
         ...req.params,
         ...req.query,
-        user_id: req.user_id,
+        authAccount: req.account_id,
+        user_type: req.user.user_type,
       };
       const products = await productService.getProducts(body);
       if (products && products?.data?.length > 0)
@@ -49,7 +50,7 @@ module.exports = {
 
   getProduct: async (req, res) => {
     try {
-      const body = { ...req.body, ...req.params, user_id: req.user_id };
+      const body = { ...req.body, ...req.params, authAccount: req.account_id };
       const product = await productService.getProduct(body);
       if (product)
         return helper.apiResponse(
@@ -67,7 +68,7 @@ module.exports = {
 
   updateProduct: async (req, res) => {
     try {
-      const body = { ...req.body, ...req.params, user_id: req.user_id };
+      const body = { ...req.body, ...req.params, authAccount: req.account_id };
       const updatedProduct = await productService.updateProduct(body);
       if (updatedProduct)
         return helper.apiResponse(
@@ -85,7 +86,7 @@ module.exports = {
 
   deleteProduct: async (req, res) => {
     try {
-      const body = { ...req.body, ...req.params, user_id: req.user_id };
+      const body = { ...req.body, ...req.params, authAccount: req.account_id };
       const deletedProduct = await productService.deleteProduct(body);
       if (deletedProduct)
         return helper.apiResponse(

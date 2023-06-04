@@ -30,7 +30,8 @@ module.exports = {
         ...req.body,
         ...req.params,
         ...req.query,
-        user_id: req.user_id,
+        user_type: req.user.user_type,
+        authAccount: req.account_id,
       };
       const customers = await customerService.getCustomers(body);
       if (customers && customers?.data?.length > 0) {
@@ -50,7 +51,7 @@ module.exports = {
 
   getCustomer: async (req, res) => {
     try {
-      const body = { customerId: req.params.customerId };
+      const body = { account_id: req.params.account_id };
       const customer = await customerService.getCustomer(body);
       if (customer)
         return helper.apiResponse(
@@ -68,7 +69,7 @@ module.exports = {
 
   updateCustomer: async (req, res) => {
     try {
-      const body = { ...req.body, ...req.params, user_id: req.user_id };
+      const body = { ...req.body, ...req.params, authAccount: req.account_id };
       const updatedProduct = await customerService.updateCustomer(body);
       if (updatedProduct)
         return helper.apiResponse(
@@ -86,7 +87,7 @@ module.exports = {
 
   deleteCustomer: async (req, res) => {
     try {
-      const body = { ...req.body, ...req.params, user_id: req.user_id };
+      const body = { ...req.body, ...req.params, authAccount: req.account_id };
       const deletedCustomer = await customerService.deleteCustomer(body);
       if (deletedCustomer)
         return helper.apiResponse(

@@ -1,12 +1,13 @@
 const Vendor = require("../../models/Vendors");
-const User = require("../../models/Users");
+const Account = require("../../models/Accounts");
+const ObjectId = require("mongoose").Types.ObjectId;
 
 const error = new Error();
 error.status = "NOT_FOUND";
 error.message = null;
 error.data = null;
 
-const vendorFilters = (filters) => {
+const vendorFilters = (filters, user_type, authAccount) => {
   if (filters) {
     if (filters.gender) {
       filters.gender = { $regex: filters.gender, $options: "i" };
@@ -59,10 +60,15 @@ const vendorFilters = (filters) => {
     }
   }
 
-  return { ...filters, deleted_at: null };
+  if (user_type !== "admin") {
+    filters = { account_id: authAccount };
+  }
+
+  return { ...filters, deleted_by: { $eq: null } };
 };
 
 const select = [
+  "account_id",
   "first_name",
   "last_name",
   "email",
@@ -93,9 +99,11 @@ module.exports = {
         gender,
         user_type,
         password,
+        account_id,
       } = body;
       /** Add Vendor In Schema*/
       const addVendor = new Vendor({
+        account_id: account_id,
         first_name: first_name,
         last_name: last_name,
         email: email,
@@ -108,10 +116,10 @@ module.exports = {
         gender: gender,
       });
       await addVendor.save();
-      return await User.findOne({ email: email }).lean();
+      return await Account.findOne({ email: email }).lean();
     } catch (err) {
       error.status = "VALIDATION_ERR";
-      error.message = `User Not Created (${
+      error.message = `Account Not Created (${
         err?.keyValue ? Object.values(err?.keyValue) : err.message
       }) ${err?.code === 11000 ? "Already Exist" : ""}`;
       throw error;
@@ -119,13 +127,17 @@ module.exports = {
   },
 
   getVendors: async (body) => {
-    const { perPage, page, tableFilters, sort } = body;
+    const { perPage, page, tableFilters, sort, user_type, authAccount } = body;
     const sorter = sort ? JSON.parse(sort) : null;
     const filters = tableFilters ? JSON.parse(tableFilters) : null;
     const startIndex = ((page || 1) - 1) * (perPage || 10);
-    const totalRecord = await Vendor.find(vendorFilters(filters)).count();
+    const totalRecord = await Vendor.find(
+      vendorFilters(filters, user_type, authAccount)
+    ).count();
     const tableRows = helper.pagination(totalRecord, page || 1, perPage || 10);
-    const record = await Vendor.find(vendorFilters(filters))
+    const record = await Vendor.find(
+      vendorFilters(filters, user_type, authAccount)
+    )
       .select(select)
       .sort({ [sorter?.value || "createdAt"]: sorter?.state || -1 })
       .skip(startIndex)
@@ -136,48 +148,67 @@ module.exports = {
   },
 
   getVendor: async (body) => {
-    const { vendorId } = body;
-    return await Vendor.findOne({ _id: vendorId, deleted_by: null })
+    const { account_id } = body;
+    return await Vendor.findOne({
+      account_id: new ObjectId(account_id),
+      deleted_by: { $eq: null },
+    })
       .select(select)
       .lean();
   },
 
   updateVendor: async (body) => {
     const {
-      vendorId,
-      user_id,
+      account_id,
+      authAccount,
       business_name,
       first_name,
       last_name,
-      email,
       address,
       phone_number,
       date_of_birth,
       gender,
     } = body;
+    await Account.updateOne(
+      {
+        _id: new ObjectId(account_id),
+        deleted_at: { $eq: null },
+      },
+      { first_name, last_name, phone_number, updated_by: authAccount }
+    );
     return await Vendor.findOneAndUpdate(
-      { _id: vendorId, deleted_at: null },
+      { account_id: new ObjectId(account_id), deleted_at: { $eq: null } },
       {
         business_name,
         first_name,
         last_name,
-        email,
         address,
         phone_number,
         date_of_birth,
         gender,
-        updated_by: user_id,
+        updated_by: authAccount,
       },
       { new: true }
     ).lean();
   },
 
   deleteVendor: async (body) => {
-    const { user_id, vendorId } = body;
+    const { authAccount, account_id } = body;
+    await Account.updateOne(
+      {
+        _id: new ObjectId(account_id),
+        deleted_at: { $eq: null },
+      },
+      { deleted_by: authAccount, deleted_at: new Date() }
+    );
     return await Vendor.findOneAndUpdate(
-      { _id: vendorId, deleted_at: null },
-      { deleted_by: user_id, deleted_at: new Date() },
+      { account_id: new ObjectId(account_id), deleted_at: { $eq: null } },
+      { deleted_by: authAccount, deleted_at: new Date() },
       { new: true }
     ).lean();
+  },
+
+  checkVendor: async (email) => {
+    return await Vendor.findOne({ email: email }).count();
   },
 };

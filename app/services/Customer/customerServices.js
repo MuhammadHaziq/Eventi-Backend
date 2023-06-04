@@ -1,12 +1,13 @@
 const Customer = require("../../models/Customers");
-const User = require("../../models/Users");
+const Account = require("../../models/Accounts");
+const ObjectId = require("mongoose").Types.ObjectId;
 
 const error = new Error();
 error.status = "NOT_FOUND";
 error.message = null;
 error.data = null;
 
-const customerFilters = (filters) => {
+const customerFilters = (filters, user_type, authAccount) => {
   if (filters) {
     if (filters.gender) {
       filters.gender = { $regex: filters.gender, $options: "i" };
@@ -59,10 +60,15 @@ const customerFilters = (filters) => {
     }
   }
 
-  return { ...filters, deleted_at: null };
+  if (user_type !== "admin") {
+    filters = { account_id: authAccount };
+  }
+
+  return { ...filters, deleted_by: { $eq: null } };
 };
 
 const select = [
+  "account_id",
   "first_name",
   "last_name",
   "email",
@@ -94,9 +100,11 @@ const customerService = {
         date_of_birth,
         user_type,
         password,
+        account_id,
       } = body;
       /** Add Customer In Customer Schema*/
       const addCustomer = new Customer({
+        account_id: account_id,
         first_name: first_name,
         last_name: last_name,
         email: email,
@@ -110,7 +118,7 @@ const customerService = {
         date_of_birth: date_of_birth,
       });
       await addCustomer.save();
-      return await User.findOne({ email: email }).lean();
+      return await Account.findOne({ email: email }).lean();
     } catch (err) {
       error.status = "VALIDATION_ERR";
       error.message = `Customer Not Created (${
@@ -121,13 +129,17 @@ const customerService = {
   },
 
   getCustomers: async (body) => {
-    const { perPage, page, tableFilters, sort } = body;
+    const { perPage, page, tableFilters, sort, user_type, authAccount } = body;
     const sorter = sort ? JSON.parse(sort) : null;
     const filters = tableFilters ? JSON.parse(tableFilters) : null;
     const startIndex = ((page || 1) - 1) * (perPage || 10);
-    const totalRecord = await Customer.find(customerFilters(filters)).count();
+    const totalRecord = await Customer.find(
+      customerFilters(filters, user_type, authAccount)
+    ).count();
     const tableRows = helper.pagination(totalRecord, page || 1, perPage || 10);
-    const record = await Customer.find(customerFilters(filters))
+    const record = await Customer.find(
+      customerFilters(filters, user_type, authAccount)
+    )
       .select(select)
       .sort({ [sorter?.value || "createdAt"]: sorter?.state || -1 })
       .skip(startIndex)
@@ -138,15 +150,18 @@ const customerService = {
   },
 
   getCustomer: async (body) => {
-    const { customerId } = body;
-    return await Customer.findOne({ _id: customerId, deleted_by: null })
+    const { account_id } = body;
+    return await Customer.findOne({
+      account_id: new ObjectId(account_id),
+      deleted_by: { $eq: null },
+    })
       .select(select)
       .lean();
   },
 
   updateCustomer: async (body) => {
     const {
-      customerId,
+      account_id,
       first_name,
       last_name,
       business_name,
@@ -155,12 +170,19 @@ const customerService = {
       phone_number,
       gender,
       date_of_birth,
-      user_id,
+      authAccount,
     } = body;
-    const exist = await customerService.getCustomer({ customerId });
+    const exist = await customerService.getCustomer({ account_id });
     if (exist) {
+      await Account.updateOne(
+        {
+          _id: new ObjectId(account_id),
+          deleted_at: { $eq: null },
+        },
+        { first_name, last_name, phone_number, updated_by: authAccount }
+      );
       return await Customer.findOneAndUpdate(
-        { _id: customerId, deleted_at: null },
+        { account_id: new ObjectId(account_id), deleted_at: { $eq: null } },
         {
           first_name,
           last_name,
@@ -170,7 +192,7 @@ const customerService = {
           phone_number,
           gender,
           date_of_birth,
-          updated_by: user_id,
+          updated_by: authAccount,
         },
         { new: true }
       ).lean();
@@ -179,16 +201,27 @@ const customerService = {
   },
 
   deleteCustomer: async (body) => {
-    const { user_id, customerId } = body;
-    const exist = await customerService.getCustomer({ customerId });
+    const { authAccount, account_id } = body;
+    const exist = await customerService.getCustomer({ account_id });
     if (exist) {
+      await Account.updateOne(
+        {
+          _id: new ObjectId(account_id),
+          deleted_at: { $eq: null },
+        },
+        { deleted_by: authAccount, deleted_at: new Date() }
+      );
       return await Customer.findOneAndUpdate(
-        { _id: customerId, deleted_at: null },
-        { deleted_by: user_id, deleted_at: new Date() },
+        { _id: account_id, deleted_at: null },
+        { deleted_by: authAccount, deleted_at: new Date() },
         { new: true }
       ).lean();
     }
     return false;
+  },
+
+  checkCustomer: async (email) => {
+    return await Customer.findOne({ email: email }).count();
   },
 };
 module.exports = customerService;
