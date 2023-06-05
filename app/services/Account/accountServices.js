@@ -185,12 +185,12 @@ const accountService = {
       permission = customerNav;
     }
 
-    const data = await Account.find({
+    const data = await Account.findOne({
       _id: new ObjectId(account_id),
       deleted_by: { $eq: null },
     }).lean();
 
-    if (data && data?.length > 0) {
+    if (data) {
       return { data, permissions: permission };
     }
     return null;

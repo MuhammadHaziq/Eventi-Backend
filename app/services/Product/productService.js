@@ -41,7 +41,15 @@ module.exports = {
   },
 
   getProducts: async (body) => {
-    const { authAccount, perPage, page, tableFilters, sort, user_type } = body;
+    const {
+      authAccount,
+      perPage,
+      page,
+      tableFilters,
+      sort,
+      user_type,
+      no_limit,
+    } = body;
     const sorter = sort ? JSON.parse(sort) : null;
     const filters = tableFilters ? JSON.parse(tableFilters) : null;
     const totalRecord = await Product.find(
@@ -54,7 +62,7 @@ module.exports = {
     )
       .sort({ [sorter?.value || "createdAt"]: sorter?.state || -1 })
       .skip(startIndex)
-      .limit(perPage || 10)
+      .limit(no_limit ? "" : perPage || 10)
       .lean();
     tableRows.data = record;
     return tableRows;
