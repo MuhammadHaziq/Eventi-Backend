@@ -4,6 +4,7 @@ const customerNav = [
   { permission: "customer-edit" },
   { permission: "event-list" },
   { permission: "event-join" },
+  { permission: "event-detail" },
 ];
 
 const vendorNav = [
@@ -12,7 +13,7 @@ const vendorNav = [
   { permission: "vendor-edit" },
   { permission: "event-list" },
   { permission: "event-join" },
-  { permission: "event-add" },
+  { permission: "event-detail" },
   { permission: "product-list" },
   { permission: "product-add" },
   { permission: "product-edit" },
@@ -32,6 +33,8 @@ const adminNav = [
   { permission: "event-add" },
   { permission: "event-list" },
   { permission: "event-join" },
+  { permission: "event-edit" },
+  { permission: "event-detail" },
   { permission: "event-delete" },
   { permission: "product-list" },
   { permission: "product-add" },
