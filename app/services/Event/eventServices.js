@@ -173,4 +173,16 @@ module.exports = {
       { new: true }
     ).lean();
   },
+
+  joinEvent: async (body) => {
+    const { account_id, event_id } = body;
+    return await Event.updateOne(
+      { _id: new ObjectId(event_id) },
+      {
+        $push: {
+          joined_vendors: new ObjectId(account_id),
+        },
+      }
+    );
+  },
 };

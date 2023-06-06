@@ -10,10 +10,13 @@ const VendorJoinedEvents = new Schema(
       index: true,
     },
     account_id: { type: Schema.Types.ObjectId, ref: "Account", required: true },
-    vendor_id: { type: Schema.Types.ObjectId, ref: "Vendors", required: true },
     products: [
       {
-        _id: { type: Schema.Types.ObjectId, ref: "Account", required: true },
+        product_id: {
+          type: Schema.Types.ObjectId,
+          ref: "Product",
+          required: true,
+        },
         product_name: { type: String, required: true, trim: true },
         product_description: { type: String, trim: true },
         product_quantity: {
