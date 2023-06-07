@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const VendorJoinedEvents = new Schema(
+const VendorJoinedEventsSchema = new Schema(
   {
     event_id: {
       type: Schema.Types.ObjectId,
@@ -49,4 +49,19 @@ const VendorJoinedEvents = new Schema(
   }
 );
 
-module.exports = mongoose.model("VendorJoinedEvents", VendorJoinedEvents);
+VendorJoinedEventsSchema.virtual("event_detail", {
+  ref: "Event",
+  localField: "event_id",
+  foreignField: "_id",
+  justOne: true,
+});
+
+VendorJoinedEventsSchema.pre("find", function () {
+  this.populate("event_detail");
+});
+
+VendorJoinedEventsSchema.pre("findOne", function () {
+  this.populate("event_detail");
+});
+
+module.exports = mongoose.model("VendorJoinedEvents", VendorJoinedEventsSchema);
