@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-const customerController = require("../../controllers/Customer/customerController");
+const customerController = require("../../controllers/customer/customerController");
 const authMiddleware = require("../../middleware/authMiddleware");
 
 router.route("/").post(customerController.addCustomer);

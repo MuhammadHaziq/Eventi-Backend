@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-const eventController = require("../../controllers/Event/eventController");
+const eventController = require("../../controllers/event/eventController");
 const authMiddleware = require("../../middleware/authMiddleware");
 
 router.route("/").post(authMiddleware, eventController.addEvent);

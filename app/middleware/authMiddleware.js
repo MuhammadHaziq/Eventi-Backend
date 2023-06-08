@@ -1,5 +1,5 @@
 const config = require("../../config/appConfig");
-const Account = require("../models/Accounts");
+const Account = require("../models/accounts");
 /**
  * @param req
  * @param res

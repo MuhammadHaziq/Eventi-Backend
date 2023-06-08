@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-const vendorController = require("../../controllers/Vendor/vendorController");
+const vendorController = require("../../controllers/vendor/vendorController");
 const authMiddleware = require("../../middleware/authMiddleware");
 
 router.route("/").post(vendorController.addVendor);
