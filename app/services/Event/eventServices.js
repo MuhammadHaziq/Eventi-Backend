@@ -185,4 +185,16 @@ module.exports = {
       }
     );
   },
+
+  customerJoinEvent: async (body) => {
+    const { account_id, eventId } = body;
+    return await Event.updateOne(
+      { _id: new ObjectId(eventId) },
+      {
+        $push: {
+          joined_customers: new ObjectId(account_id),
+        },
+      }
+    );
+  },
 };

@@ -130,4 +130,32 @@ module.exports = {
       return helper.apiResponse(res, true, err.message, null, statusCode);
     }
   },
+
+  customerJoinEvent: async (req, res) => {
+    try {
+      const body = {
+        ...req.body,
+        ...req.params,
+        ...req,
+        authAccount: req.account_id,
+      };
+      const updatedEvent = await eventService.customerJoinEvent(body);
+      if (updatedEvent)
+        return helper.apiResponse(
+          res,
+          false,
+          "Event Joined Successfully",
+          updatedEvent
+        );
+      return helper.apiResponse(
+        res,
+        true,
+        "Event Not Joined Successfully",
+        null
+      );
+    } catch (err) {
+      const statusCode = err.status || "INTERNAL_SERVER_ERROR";
+      return helper.apiResponse(res, true, err.message, null, statusCode);
+    }
+  },
 };
