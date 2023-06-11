@@ -40,6 +40,10 @@ const adminNav = [
   { permission: "product-add" },
   { permission: "product-edit" },
   { permission: "product-delete" },
+  { permission: "admin-add" },
+  { permission: "admin-list" },
+  { permission: "admin-edit" },
+  { permission: "admin-delete" },
 ];
 module.exports = {
   adminNav,
