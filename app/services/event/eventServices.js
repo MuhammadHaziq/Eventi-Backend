@@ -105,8 +105,16 @@ module.exports = {
   },
 
   getEvent: async (body) => {
-    const { eventId } = body;
-
+    const { eventId, user_type } = body;
+    if (user_type !== "vendor") {
+      return await Event.findOne({
+        _id: new ObjectId(eventId),
+        deleted_by: { $eq: null },
+      })
+        .populate("joined_customers")
+        .populate("joined_vendors")
+        .lean();
+    }
     return await Event.findOne({
       _id: new ObjectId(eventId),
       deleted_by: { $eq: null },
@@ -187,7 +195,17 @@ module.exports = {
   },
 
   customerJoinEvent: async (body) => {
-    const { account_id, eventId } = body;
+    const { account_id, eventId, status } = body;
+    if (status === "remove") {
+      return await Event.updateOne(
+        { _id: new ObjectId(eventId) },
+        {
+          $pull: {
+            joined_customers: new ObjectId(account_id),
+          },
+        }
+      );
+    }
     return await Event.updateOne(
       { _id: new ObjectId(eventId) },
       {
