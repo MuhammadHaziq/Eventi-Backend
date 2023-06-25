@@ -1,7 +1,7 @@
 const customerNav = [
   { permission: "dashboard" },
-  { permission: "customer-list" },
-  { permission: "customer-edit" },
+  // { permission: "customer-list" },
+  // { permission: "customer-edit" },
   { permission: "event-list" },
   { permission: "event-join" },
   { permission: "event-detail" },
@@ -11,8 +11,8 @@ const customerNav = [
 
 const vendorNav = [
   { permission: "dashboard" },
-  { permission: "vendor-list" },
-  { permission: "vendor-edit" },
+  // { permission: "vendor-list" },
+  // { permission: "vendor-edit" },
   { permission: "event-list" },
   { permission: "event-join" },
   { permission: "event-detail" },
