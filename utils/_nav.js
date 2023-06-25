@@ -5,6 +5,8 @@ const customerNav = [
   { permission: "event-list" },
   { permission: "event-join" },
   { permission: "event-detail" },
+  { permission: "view-profile" },
+  { permission: "edit-profile" },
 ];
 
 const vendorNav = [
@@ -18,6 +20,8 @@ const vendorNav = [
   { permission: "product-add" },
   { permission: "product-edit" },
   { permission: "product-delete" },
+  { permission: "view-profile" },
+  { permission: "edit-profile" },
 ];
 
 const adminNav = [
@@ -44,6 +48,8 @@ const adminNav = [
   { permission: "admin-list" },
   { permission: "admin-edit" },
   { permission: "admin-delete" },
+  { permission: "view-profile" },
+  { permission: "edit-profile" },
 ];
 module.exports = {
   adminNav,
