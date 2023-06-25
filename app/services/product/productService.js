@@ -38,11 +38,18 @@ const getAccountFilter = (userType, authAccount) => {
 
 module.exports = {
   addProduct: async (body) => {
-    const { product_name, product_price, product_quantity, authAccount } = body;
+    const {
+      product_name,
+      product_price,
+      product_quantity,
+      authAccount,
+      vendor_account_id,
+    } = body;
     const newProduct = new Product({
       product_name,
       product_price,
       product_quantity,
+      vendor_account_id,
       created_by: authAccount,
     });
     return await newProduct.save();
@@ -93,6 +100,7 @@ module.exports = {
       authAccount,
       product_id,
       user_type,
+      vendor_account_id,
     } = body;
     const updatedProduct = await Product.findOneAndUpdate(
       {
@@ -104,6 +112,7 @@ module.exports = {
         product_name,
         product_price,
         product_quantity,
+        vendor_account_id,
         updated_by: authAccount,
       },
       { new: true }

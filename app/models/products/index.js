@@ -11,6 +11,11 @@ const ProductSchema = new Schema(
       trim: true,
       default: null,
     },
+    vendor_account_id: {
+      type: Schema.Types.ObjectId,
+      ref: "Account",
+      required: true,
+    },
     created_by: { type: Schema.Types.ObjectId, ref: "Account", required: true },
     updated_by: { type: Schema.Types.ObjectId, ref: "Account", default: null },
     deleted_by: { type: Schema.Types.ObjectId, ref: "Account", default: null },

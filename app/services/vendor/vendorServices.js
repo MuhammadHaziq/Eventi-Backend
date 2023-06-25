@@ -217,4 +217,15 @@ module.exports = {
       deleted_by: { $eq: null },
     }).count();
   },
+
+  getAllVendors: async (body) => {
+    const { user_type, authAccount } = body;
+    const record = await Vendor.find(
+      vendorFilters(null, user_type, authAccount)
+    )
+      .select(select)
+      .sort({ createdAt: -1 })
+      .lean();
+    return record;
+  },
 };

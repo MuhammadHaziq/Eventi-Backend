@@ -136,4 +136,30 @@ module.exports = {
       return helper.apiResponse(res, true, err.message, null, statusCode);
     }
   },
+
+  getAllVendors: async (req, res) => {
+    try {
+      const body = {
+        user_type: req.user.user_type,
+        authAccount: req.account_id,
+      };
+      const vendors = await vendorService.getAllVendors(body);
+      if (vendors)
+        return helper.apiResponse(
+          res,
+          false,
+          "Vendors Fetch Successfully",
+          vendors
+        );
+      return helper.apiResponse(
+        res,
+        true,
+        "Vendors Not Fetch Successfully",
+        null
+      );
+    } catch (err) {
+      const statusCode = err.status || "INTERNAL_SERVER_ERROR";
+      return helper.apiResponse(res, true, err.message, null, statusCode);
+    }
+  },
 };
