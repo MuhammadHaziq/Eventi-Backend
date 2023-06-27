@@ -16,6 +16,7 @@ const ProductSchema = new Schema(
       ref: "Account",
       required: true,
     },
+    product_images: [{ type: String, required: false, trim: true }],
     created_by: { type: Schema.Types.ObjectId, ref: "Account", required: true },
     updated_by: { type: Schema.Types.ObjectId, ref: "Account", default: null },
     deleted_by: { type: Schema.Types.ObjectId, ref: "Account", default: null },

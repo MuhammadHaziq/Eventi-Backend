@@ -3,7 +3,12 @@ const productService = require("../../services/product/productService");
 module.exports = {
   addProduct: async (req, res) => {
     try {
-      const body = { ...req.body, ...req.params, authAccount: req.account_id };
+      const body = {
+        ...req.body,
+        ...req.params,
+        ...req,
+        authAccount: req.account_id,
+      };
       const newProduct = await productService.addProduct(body);
       if (newProduct)
         return helper.apiResponse(

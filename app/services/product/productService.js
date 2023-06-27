@@ -1,4 +1,5 @@
 const appConfig = require("../../../config/appConfig");
+const { uploadImages } = require("../../../utils/fileHandler");
 const Product = require("../../models/products");
 
 const error = new Error();
@@ -45,11 +46,28 @@ module.exports = {
       authAccount,
       vendor_account_id,
     } = body;
+    let images = null;
+    const productImages = body.files ? body.files.product_images : null;
+    if (productImages) {
+      let response = await uploadImages(
+        productImages,
+        `productImage/${authAccount}`
+      );
+      if (response.images.length) {
+        images = response.images;
+      } else {
+        error.status = "BAD_REQUEST";
+        error.message = response?.message;
+        error.data = null;
+        throw error;
+      }
+    }
     const newProduct = new Product({
       product_name,
       product_price,
       product_quantity,
       vendor_account_id,
+      product_images: images,
       created_by: authAccount,
     });
     return await newProduct.save();
