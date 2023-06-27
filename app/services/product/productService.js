@@ -135,43 +135,52 @@ const productService = {
       vendor_account_id,
       removed_files,
     } = body;
+    try {
+      /** Delete Files First */
+      if (JSON.parse(removed_files) && JSON.parse(removed_files)?.length > 0) {
+        await productService.deleteImages(
+          JSON.parse(removed_files),
+          product_id
+        );
+      }
 
-    /** Delete Files First */
-    if (JSON.parse(removed_files) && JSON.parse(removed_files)?.length > 0) {
-      await productService.deleteImages(JSON.parse(removed_files), product_id);
+      const productImages = body.files ? body.files.product_images : null;
+      let images = await productService.saveImages(productImages, product_id);
+
+      const dbImages =
+        (await productService.getProductImages(product_id))?.[0]
+          ?.product_images || [];
+
+      images = [
+        ...(images || []),
+        ...(dbImages || []).filter(function (obj) {
+          return (removed_files || []).indexOf(obj) == -1;
+        }),
+      ];
+
+      const updatedProduct = await Product.findOneAndUpdate(
+        {
+          _id: product_id,
+          deleted_at: { $eq: null },
+          ...getAccountFilter(user_type, authAccount),
+        },
+        {
+          product_name,
+          product_price,
+          product_quantity,
+          vendor_account_id,
+          product_images: images,
+          updated_by: authAccount,
+        },
+        { new: true }
+      ).lean();
+      return updatedProduct;
+    } catch (err) {
+      error.status = "BAD_REQUEST";
+      error.message = err?.message;
+      error.data = null;
+      throw error;
     }
-
-    const productImages = body.files ? body.files.product_images : null;
-    let images = await productService.saveImages(productImages, product_id);
-
-    const dbImages =
-      (await productService.getProductImages(product_id))?.[0]
-        ?.product_images || [];
-
-    images = [
-      ...(images || []),
-      ...(dbImages || []).filter(function (obj) {
-        return (removed_files || []).indexOf(obj) == -1;
-      }),
-    ];
-
-    const updatedProduct = await Product.findOneAndUpdate(
-      {
-        _id: product_id,
-        deleted_at: { $eq: null },
-        ...getAccountFilter(user_type, authAccount),
-      },
-      {
-        product_name,
-        product_price,
-        product_quantity,
-        vendor_account_id,
-        product_images: images,
-        updated_by: authAccount,
-      },
-      { new: true }
-    ).lean();
-    return updatedProduct;
   },
 
   deleteProduct: async (body) => {

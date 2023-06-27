@@ -1,5 +1,9 @@
 const Event = require("../../models/events");
-const { uploadImages } = require("../../../utils/fileHandler");
+const {
+  uploadImages,
+  removeFiles,
+  removeAllFiles,
+} = require("../../../utils/fileHandler");
 const ObjectId = require("mongoose").Types.ObjectId;
 const error = new Error();
 error.status = "NOT_FOUND";
@@ -39,13 +43,12 @@ const eventFilters = (filters, authAccount) => {
   return { ...filters, deleted_at: { $eq: null } };
 };
 
-module.exports = {
+const eventService = {
   addEvent: async (body) => {
     const {
       event_name,
       event_date,
       event_location,
-      banner_images,
       type_of_event,
       expected_attendence,
       phone_number,
@@ -54,36 +57,44 @@ module.exports = {
       special_request,
       authAccount,
     } = body;
-    let images = null;
-    const bannerImages = body.files ? body.files.banner_images : null;
-    if (bannerImages) {
-      let response = await uploadImages(
-        bannerImages,
-        `eventImage/${authAccount}`
-      );
-      if (response.images.length) {
-        images = response.images;
-      } else {
-        error.status = "BAD_REQUEST";
-        error.message = response?.message;
-        error.data = null;
-        throw error;
+    try {
+      const addEvent = new Event({
+        created_by: authAccount,
+        event_name,
+        event_date,
+        event_location,
+        type_of_event,
+        expected_attendence,
+        phone_number,
+        equipments,
+        security,
+        special_request,
+      });
+
+      const insertedEvent = await addEvent.save();
+      if (insertedEvent) {
+        const bannerImages = body.files ? body.files.banner_images : null;
+        const eventId = insertedEvent?._id;
+        console.log(eventId, "eventId");
+        const images = await eventService.saveImages(bannerImages, eventId);
+        console.log(images, "images");
+        return await Event.findOneAndUpdate(
+          {
+            _id: eventId,
+          },
+          {
+            banner_images: images,
+            updated_by: authAccount,
+          },
+          { new: true }
+        ).lean();
       }
+    } catch (err) {
+      error.status = "BAD_REQUEST";
+      error.message = err?.message;
+      error.data = null;
+      throw error;
     }
-    const addEvent = new Event({
-      created_by: authAccount,
-      event_name,
-      event_date,
-      event_location,
-      banner_images: images,
-      type_of_event,
-      expected_attendence,
-      phone_number,
-      equipments,
-      security,
-      special_request,
-    });
-    return await addEvent.save();
   },
 
   getEvents: async (body) => {
@@ -128,53 +139,61 @@ module.exports = {
       event_name,
       event_date,
       event_location,
-      banner_images,
       type_of_event,
       expected_attendence,
       phone_number,
       equipments,
       security,
       special_request,
+      removed_files,
     } = body;
-    let images = null;
-    // banner_images && JSON.parse(banner_images);
-    const bannerImages = body.files ? body.files.banner_images : null;
 
-    if (bannerImages) {
-      let response = await uploadImages(
-        bannerImages,
-        `eventImage/${authAccount}`
-      );
-      if (response.images.length) {
-        images = { banner_images: response.images };
-      } else {
-        error.status = "BAD_REQUEST";
-        error.message = response?.message;
-        error.data = null;
-        throw error;
+    try {
+      /** Delete Files First */
+      if (JSON.parse(removed_files) && JSON.parse(removed_files)?.length > 0) {
+        await eventService.deleteImages(JSON.parse(removed_files), eventId);
       }
+
+      const bannerImages = body.files ? body.files.banner_images : null;
+      let images = await eventService.saveImages(bannerImages, eventId);
+
+      const dbImages =
+        (await eventService.getEventImages(eventId))?.[0]?.banner_images || [];
+
+      images = [
+        ...(images || []),
+        ...(dbImages || []).filter(function (obj) {
+          return (removed_files || []).indexOf(obj) == -1;
+        }),
+      ];
+      return await Event.findOneAndUpdate(
+        { _id: eventId },
+        {
+          event_name,
+          event_date,
+          event_location,
+          banner_images: images,
+          type_of_event,
+          expected_attendence,
+          phone_number,
+          equipments,
+          security,
+          special_request,
+          updated_by: authAccount,
+        },
+        { new: true }
+      ).lean();
+    } catch (err) {
+      error.status = "BAD_REQUEST";
+      error.message = err?.message;
+      error.data = null;
+      throw error;
     }
-    return await Event.findOneAndUpdate(
-      { _id: eventId },
-      {
-        event_name,
-        event_date,
-        event_location,
-        ...images,
-        type_of_event,
-        expected_attendence,
-        phone_number,
-        equipments,
-        security,
-        special_request,
-        updated_by: authAccount,
-      },
-      { new: true }
-    ).lean();
   },
 
   deleteEvent: async (body) => {
     const { authAccount, eventId } = body;
+    await eventService.deleteAllImages(eventId);
     return await Event.findOneAndUpdate(
       { _id: new ObjectId(eventId), deleted_by: { $eq: null } },
       { deleted_by: authAccount, deleted_at: new Date() },
@@ -215,4 +234,44 @@ module.exports = {
       }
     );
   },
+
+  getEventImages: async (eventId) => {
+    return Event.find({ _id: new ObjectId(eventId) }).select("banner_images");
+  },
+
+  deleteImages: async (fileNames, eventId) => {
+    let response = await removeFiles(fileNames, `eventImage/${eventId}`);
+    if (response.success === true) {
+      return response.images;
+    } else {
+      error.status = "BAD_REQUEST";
+      error.message = response?.message;
+      error.data = null;
+      throw error;
+    }
+    return [];
+  },
+
+  saveImages: async (files, eventId) => {
+    const bannerImages = files ? files : null;
+    if (bannerImages) {
+      let response = await uploadImages(bannerImages, `eventImage/${eventId}`);
+      if (response.success === true) {
+        return response.images;
+      } else {
+        error.status = "BAD_REQUEST";
+        error.message = response?.message;
+        error.data = null;
+        throw error;
+      }
+    } else {
+      return [];
+    }
+  },
+
+  deleteAllImages: async (eventId) => {
+    return await removeAllFiles(`eventImage/${eventId}`);
+  },
 };
+
+module.exports = eventService;
