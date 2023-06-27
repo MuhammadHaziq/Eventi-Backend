@@ -14,16 +14,50 @@ const EventSchema = new Schema(
     security: { type: String, required: true, default: false },
     joined_customers: [
       {
-        type: Schema.Types.ObjectId,
-        ref: "Account",
-        default: null,
+        customer_id: {
+          type: Schema.Types.ObjectId,
+          ref: "Account",
+          default: null,
+        },
+        event_status: {
+          type: String,
+          enum: [
+            "Pending",
+            "Request To Approved",
+            "Pending For Payment",
+            "Approved",
+          ],
+          default: "Pending",
+        },
+        approved_by: {
+          type: Schema.Types.ObjectId,
+          ref: "Account",
+          default: null,
+        },
       },
     ],
     joined_vendors: [
       {
-        type: Schema.Types.ObjectId,
-        ref: "Account",
-        default: null,
+        vendor_id: {
+          type: Schema.Types.ObjectId,
+          ref: "Account",
+          default: null,
+        },
+        event_status: {
+          type: String,
+          enum: [
+            "Pending",
+            "Request To Approved",
+            "Pending For Payment",
+            "Approved",
+          ],
+          default: "Pending",
+        },
+        approved_by: {
+          type: Schema.Types.ObjectId,
+          ref: "Account",
+          default: null,
+        },
       },
     ],
     special_request: { type: String, trim: true },

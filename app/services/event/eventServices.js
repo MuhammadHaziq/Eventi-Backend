@@ -122,7 +122,7 @@ const eventService = {
         _id: new ObjectId(eventId),
         deleted_by: { $eq: null },
       })
-        .populate("joined_customers")
+        .populate("joined_customers.customer_id")
         .populate("joined_vendors")
         .lean();
     }
@@ -220,19 +220,74 @@ const eventService = {
         { _id: new ObjectId(eventId) },
         {
           $pull: {
-            joined_customers: new ObjectId(account_id),
+            "joined_customers.customer_id": new ObjectId(account_id),
+          },
+        }
+      );
+    } else if (status === "Request To Approved") {
+      return await Event.updateOne(
+        { _id: new ObjectId(eventId) },
+        {
+          $push: {
+            joined_customers: {
+              customer_id: new ObjectId(account_id),
+              event_status: status,
+            },
+          },
+        }
+      );
+    } else {
+      return await Event.updateOne(
+        {
+          _id: new ObjectId(eventId),
+          "joined_customers.customer_id": new ObjectId(account_id),
+        },
+        {
+          $set: {
+            "joined_customers.$.event_status": status,
           },
         }
       );
     }
-    return await Event.updateOne(
-      { _id: new ObjectId(eventId) },
-      {
-        $push: {
-          joined_customers: new ObjectId(account_id),
+  },
+
+  adminUpdateCustomerStatus: async (body) => {
+    const { authAccount, eventId, status, customer_id } = body;
+    if (status === "remove") {
+      return await Event.updateOne(
+        { _id: new ObjectId(eventId) },
+        {
+          $pull: {
+            "joined_customers.customer_id": new ObjectId(customer_id),
+          },
+        }
+      );
+    } else if (status === "Request To Approved") {
+      return await Event.updateOne(
+        { _id: new ObjectId(eventId) },
+        {
+          $push: {
+            joined_customers: {
+              customer_id: new ObjectId(customer_id),
+              event_status: status,
+            },
+          },
+        }
+      );
+    } else {
+      return await Event.updateOne(
+        {
+          _id: new ObjectId(eventId),
+          "joined_customers.customer_id": new ObjectId(customer_id),
         },
-      }
-    );
+        {
+          $set: {
+            "joined_customers.$.event_status": status,
+            "joined_customers.$.approved_by": new ObjectId(authAccount),
+          },
+        }
+      );
+    }
   },
 
   getEventImages: async (eventId) => {

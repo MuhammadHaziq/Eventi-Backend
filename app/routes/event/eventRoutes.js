@@ -11,6 +11,10 @@ router.route("/:eventId").delete(authMiddleware, eventController.deleteEvent);
 router
   .route("/:eventId/:account_id")
   .put(authMiddleware, eventController.customerJoinEvent);
+router
+  .route("/adminUpdateCustomerStatus/:eventId/:customer_id")
+  .put(authMiddleware, eventController.adminUpdateCustomerStatus);
+
 module.exports = {
   router: router,
   basePath: "event",
