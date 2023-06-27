@@ -81,6 +81,7 @@ module.exports = {
       const body = {
         ...req.body,
         ...req.params,
+        ...req,
         authAccount: req.account_id,
         user_type: req.user.user_type,
       };

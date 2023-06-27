@@ -1,6 +1,11 @@
 const appConfig = require("../../../config/appConfig");
-const { uploadImages } = require("../../../utils/fileHandler");
+const {
+  uploadImages,
+  removeFiles,
+  removeAllFiles,
+} = require("../../../utils/fileHandler");
 const Product = require("../../models/products");
+const ObjectId = require("mongoose").Types.ObjectId;
 
 const error = new Error();
 error.status = "NOT_FOUND";
@@ -37,7 +42,7 @@ const getAccountFilter = (userType, authAccount) => {
   return (filter.created_by = authAccount);
 };
 
-module.exports = {
+const productService = {
   addProduct: async (body) => {
     const {
       product_name,
@@ -46,31 +51,40 @@ module.exports = {
       authAccount,
       vendor_account_id,
     } = body;
-    let images = null;
-    const productImages = body.files ? body.files.product_images : null;
-    if (productImages) {
-      let response = await uploadImages(
-        productImages,
-        `productImage/${authAccount}`
-      );
-      if (response.images.length) {
-        images = response.images;
-      } else {
-        error.status = "BAD_REQUEST";
-        error.message = response?.message;
-        error.data = null;
-        throw error;
+    try {
+      const newProduct = new Product({
+        product_name,
+        product_price,
+        product_quantity,
+        vendor_account_id,
+        created_by: authAccount,
+      });
+      const insertedProduct = await newProduct.save();
+      if (insertedProduct) {
+        const productImages = body.files ? body.files.product_images : null;
+        const productId = insertedProduct?._id;
+
+        const images = await productService.saveImages(
+          productImages,
+          productId
+        );
+        return await Product.findOneAndUpdate(
+          {
+            _id: productId,
+          },
+          {
+            product_images: images,
+            updated_by: authAccount,
+          },
+          { new: true }
+        ).lean();
       }
+    } catch (err) {
+      error.status = "BAD_REQUEST";
+      error.message = err?.message;
+      error.data = null;
+      throw error;
     }
-    const newProduct = new Product({
-      product_name,
-      product_price,
-      product_quantity,
-      vendor_account_id,
-      product_images: images,
-      created_by: authAccount,
-    });
-    return await newProduct.save();
   },
 
   getProducts: async (body) => {
@@ -119,7 +133,28 @@ module.exports = {
       product_id,
       user_type,
       vendor_account_id,
+      removed_files,
     } = body;
+
+    /** Delete Files First */
+    if (JSON.parse(removed_files) && JSON.parse(removed_files)?.length > 0) {
+      await productService.deleteImages(JSON.parse(removed_files), product_id);
+    }
+
+    const productImages = body.files ? body.files.product_images : null;
+    let images = await productService.saveImages(productImages, product_id);
+
+    const dbImages =
+      (await productService.getProductImages(product_id))?.[0]
+        ?.product_images || [];
+
+    images = [
+      ...(images || []),
+      ...(dbImages || []).filter(function (obj) {
+        return (removed_files || []).indexOf(obj) == -1;
+      }),
+    ];
+
     const updatedProduct = await Product.findOneAndUpdate(
       {
         _id: product_id,
@@ -131,6 +166,7 @@ module.exports = {
         product_price,
         product_quantity,
         vendor_account_id,
+        product_images: images,
         updated_by: authAccount,
       },
       { new: true }
@@ -140,6 +176,7 @@ module.exports = {
 
   deleteProduct: async (body) => {
     const { authAccount, product_id, user_type } = body;
+    await productService.deleteAllProductImages(product_id);
     return await Product.findOneAndUpdate(
       {
         _id: product_id,
@@ -150,4 +187,48 @@ module.exports = {
       { new: true }
     ).lean();
   },
+
+  getProductImages: async (productId) => {
+    return Product.find({ _id: new ObjectId(productId) }).select(
+      "product_images"
+    );
+  },
+
+  deleteImages: async (fileNames, productId) => {
+    let response = await removeFiles(fileNames, `productImage/${productId}`);
+    if (response.success === true) {
+      return response.images;
+    } else {
+      error.status = "BAD_REQUEST";
+      error.message = response?.message;
+      error.data = null;
+      throw error;
+    }
+    return [];
+  },
+
+  saveImages: async (files, productId) => {
+    const productImages = files ? files : null;
+    if (productImages) {
+      let response = await uploadImages(
+        productImages,
+        `productImage/${productId}`
+      );
+      if (response.success === true) {
+        return response.images;
+      } else {
+        error.status = "BAD_REQUEST";
+        error.message = response?.message;
+        error.data = null;
+        throw error;
+      }
+    } else {
+      return [];
+    }
+  },
+
+  deleteAllProductImages: async (productId) => {
+    return await removeAllFiles(`productImage/${productId}`);
+  },
 };
+module.exports = productService;

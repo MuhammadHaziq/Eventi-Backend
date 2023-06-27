@@ -72,4 +72,48 @@ async function uploadImages(files, folder) {
     return { success: false, images: images, message: error.message };
   }
 }
-module.exports = { uploadImages };
+
+async function removeFiles(fileNames, folder) {
+  var images = [];
+  let pciturePath = `./uploads/${folder}/`;
+  try {
+    if (fs.existsSync(pciturePath)) {
+      await asyncForEach(fileNames, async (file, index) => {
+        let imageFile = pciturePath + file;
+        if (fs.existsSync(imageFile)) {
+          fs.unlinkSync(imageFile);
+          images.push(file);
+        }
+      });
+    }
+    return {
+      success: true,
+      images: images,
+      message: "Images Successfully Removed",
+    };
+  } catch (error) {
+    return { success: false, images: images, message: error.message };
+  }
+}
+
+async function removeAllFiles(folder) {
+  var images = [];
+  let pciturePath = `./uploads/${folder}/`;
+  try {
+    if (fs.existsSync(pciturePath)) {
+      fs.rm(pciturePath, {
+        recursive: true,
+        force: true,
+      });
+    }
+    return {
+      success: true,
+      images: images,
+      message: "All Images Successfully Removed",
+    };
+  } catch (error) {
+    return { success: false, images: images, message: error.message };
+  }
+}
+
+module.exports = { uploadImages, removeFiles, removeAllFiles };
