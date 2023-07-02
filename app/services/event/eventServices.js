@@ -123,7 +123,7 @@ const eventService = {
         deleted_by: { $eq: null },
       })
         .populate("joined_customers.customer_id")
-        .populate("joined_vendors")
+        .populate("joined_vendors.vendor_id")
         .lean();
     }
     return await Event.findOne({
@@ -202,15 +202,41 @@ const eventService = {
   },
 
   joinEvent: async (body) => {
-    const { account_id, event_id } = body;
-    return await Event.updateOne(
-      { _id: new ObjectId(event_id) },
-      {
-        $push: {
-          joined_vendors: new ObjectId(account_id),
+    const { account_id, event_id, status } = body;
+    if (status === "remove") {
+      return await Event.updateOne(
+        { _id: new ObjectId(event_id) },
+        {
+          $pull: {
+            "joined_vendors.vendor_id": new ObjectId(account_id),
+          },
+        }
+      );
+    } else if (status === "Request To Approved") {
+      return await Event.updateOne(
+        { _id: new ObjectId(event_id) },
+        {
+          $push: {
+            joined_vendors: {
+              vendor_id: new ObjectId(account_id),
+              event_status: status,
+            },
+          },
+        }
+      );
+    } else {
+      return await Event.updateOne(
+        {
+          _id: new ObjectId(event_id),
+          "joined_vendors.vendor_id": new ObjectId(account_id),
         },
-      }
-    );
+        {
+          $set: {
+            "joined_vendors.$.event_status": status,
+          },
+        }
+      );
+    }
   },
 
   customerJoinEvent: async (body) => {
@@ -284,6 +310,45 @@ const eventService = {
           $set: {
             "joined_customers.$.event_status": status,
             "joined_customers.$.approved_by": new ObjectId(authAccount),
+          },
+        }
+      );
+    }
+  },
+
+  adminUpdateVendorStatus: async (body) => {
+    const { authAccount, eventId, status, vendor_id } = body;
+    if (status === "remove") {
+      return await Event.updateOne(
+        { _id: new ObjectId(eventId) },
+        {
+          $pull: {
+            "joined_vendors.vendor_id": new ObjectId(vendor_id),
+          },
+        }
+      );
+    } else if (status === "Request To Approved") {
+      return await Event.updateOne(
+        { _id: new ObjectId(eventId) },
+        {
+          $push: {
+            joined_vendors: {
+              vendor_id: new ObjectId(vendor_id),
+              event_status: status,
+            },
+          },
+        }
+      );
+    } else {
+      return await Event.updateOne(
+        {
+          _id: new ObjectId(eventId),
+          "joined_vendors.vendor_id": new ObjectId(vendor_id),
+        },
+        {
+          $set: {
+            "joined_vendors.$.event_status": status,
+            "joined_vendors.$.approved_by": new ObjectId(authAccount),
           },
         }
       );

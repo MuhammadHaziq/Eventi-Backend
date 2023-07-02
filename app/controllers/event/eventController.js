@@ -158,6 +158,34 @@ module.exports = {
       return helper.apiResponse(res, true, err.message, null, statusCode);
     }
   },
+
+  vendorJoinEvent: async (req, res) => {
+    try {
+      const body = {
+        ...req.body,
+        ...req.params,
+        ...req,
+        authAccount: req.account_id,
+      };
+      const updatedEvent = await eventService.joinEvent(body);
+      if (updatedEvent)
+        return helper.apiResponse(
+          res,
+          false,
+          "Event Status Updated Successfully",
+          updatedEvent
+        );
+      return helper.apiResponse(
+        res,
+        true,
+        "Event Status Not Updated Successfully",
+        null
+      );
+    } catch (err) {
+      const statusCode = err.status || "INTERNAL_SERVER_ERROR";
+      return helper.apiResponse(res, true, err.message, null, statusCode);
+    }
+  },
   adminUpdateCustomerStatus: async (req, res) => {
     try {
       const body = {
@@ -167,6 +195,34 @@ module.exports = {
         authAccount: req.account_id,
       };
       const updatedEvent = await eventService.adminUpdateCustomerStatus(body);
+      if (updatedEvent)
+        return helper.apiResponse(
+          res,
+          false,
+          "Event Status Updated Successfully",
+          updatedEvent
+        );
+      return helper.apiResponse(
+        res,
+        true,
+        "Event Status Not Updated Successfully",
+        null
+      );
+    } catch (err) {
+      const statusCode = err.status || "INTERNAL_SERVER_ERROR";
+      return helper.apiResponse(res, true, err.message, null, statusCode);
+    }
+  },
+
+  adminUpdateVendorStatus: async (req, res) => {
+    try {
+      const body = {
+        ...req.body,
+        ...req.params,
+        ...req,
+        authAccount: req.account_id,
+      };
+      const updatedEvent = await eventService.adminUpdateVendorStatus(body);
       if (updatedEvent)
         return helper.apiResponse(
           res,
