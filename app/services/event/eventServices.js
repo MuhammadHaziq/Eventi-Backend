@@ -201,6 +201,44 @@ const eventService = {
     ).lean();
   },
 
+  getEventImages: async (eventId) => {
+    return Event.find({ _id: new ObjectId(eventId) }).select("banner_images");
+  },
+
+  deleteImages: async (fileNames, eventId) => {
+    let response = await removeFiles(fileNames, `eventImage/${eventId}`);
+    if (response.success === true) {
+      return response.images;
+    } else {
+      error.status = "BAD_REQUEST";
+      error.message = response?.message;
+      error.data = null;
+      throw error;
+    }
+    return [];
+  },
+
+  saveImages: async (files, eventId) => {
+    const bannerImages = files ? files : null;
+    if (bannerImages) {
+      let response = await uploadImages(bannerImages, `eventImage/${eventId}`);
+      if (response.success === true) {
+        return response.images;
+      } else {
+        error.status = "BAD_REQUEST";
+        error.message = response?.message;
+        error.data = null;
+        throw error;
+      }
+    } else {
+      return [];
+    }
+  },
+
+  deleteAllImages: async (eventId) => {
+    return await removeAllFiles(`eventImage/${eventId}`);
+  },
+
   joinEvent: async (body) => {
     const { account_id, event_id, status } = body;
     if (status === "remove") {
@@ -277,7 +315,7 @@ const eventService = {
     }
   },
 
-  adminUpdateCustomerStatus: async (body) => {
+  updateCustomerStatus: async (body) => {
     const { authAccount, eventId, status, customer_id } = body;
     if (status === "remove") {
       return await Event.updateOne(
@@ -316,7 +354,7 @@ const eventService = {
     }
   },
 
-  adminUpdateVendorStatus: async (body) => {
+  updateVendorStatus: async (body) => {
     const { authAccount, eventId, status, vendor_id } = body;
     if (status === "remove") {
       return await Event.updateOne(
@@ -353,44 +391,6 @@ const eventService = {
         }
       );
     }
-  },
-
-  getEventImages: async (eventId) => {
-    return Event.find({ _id: new ObjectId(eventId) }).select("banner_images");
-  },
-
-  deleteImages: async (fileNames, eventId) => {
-    let response = await removeFiles(fileNames, `eventImage/${eventId}`);
-    if (response.success === true) {
-      return response.images;
-    } else {
-      error.status = "BAD_REQUEST";
-      error.message = response?.message;
-      error.data = null;
-      throw error;
-    }
-    return [];
-  },
-
-  saveImages: async (files, eventId) => {
-    const bannerImages = files ? files : null;
-    if (bannerImages) {
-      let response = await uploadImages(bannerImages, `eventImage/${eventId}`);
-      if (response.success === true) {
-        return response.images;
-      } else {
-        error.status = "BAD_REQUEST";
-        error.message = response?.message;
-        error.data = null;
-        throw error;
-      }
-    } else {
-      return [];
-    }
-  },
-
-  deleteAllImages: async (eventId) => {
-    return await removeAllFiles(`eventImage/${eventId}`);
   },
 };
 
