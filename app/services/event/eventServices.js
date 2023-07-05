@@ -48,6 +48,7 @@ const eventService = {
     const {
       event_name,
       event_date,
+      amount,
       event_location,
       type_of_event,
       expected_attendence,
@@ -62,6 +63,7 @@ const eventService = {
         created_by: authAccount,
         event_name,
         event_date,
+        amount,
         event_location,
         type_of_event,
         expected_attendence,
@@ -138,6 +140,7 @@ const eventService = {
       authAccount,
       event_name,
       event_date,
+      amount,
       event_location,
       type_of_event,
       expected_attendence,
@@ -171,6 +174,7 @@ const eventService = {
         {
           event_name,
           event_date,
+          amount,
           event_location,
           banner_images: images,
           type_of_event,
