@@ -15,11 +15,11 @@ router
   .route("/vendor-event-update/:eventId/:account_id")
   .put(authMiddleware, eventController.vendorJoinEvent);
 router
-  .route("/adminUpdateCustomerStatus/:eventId/:customer_id")
-  .put(authMiddleware, eventController.adminUpdateCustomerStatus);
+  .route("/update-customer-status/:eventId/:customer_id")
+  .put(authMiddleware, eventController.updateCustomerEventStatus);
 router
-  .route("/adminUpdateVendorStatus/:eventId/:vendor_id")
-  .put(authMiddleware, eventController.adminUpdateVendorStatus);
+  .route("/update-vendor-status/:eventId/:vendor_id")
+  .put(authMiddleware, eventController.updateVendorEventStatus);
 module.exports = {
   router: router,
   basePath: "event",

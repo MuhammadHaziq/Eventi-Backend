@@ -186,7 +186,8 @@ module.exports = {
       return helper.apiResponse(res, true, err.message, null, statusCode);
     }
   },
-  adminUpdateCustomerStatus: async (req, res) => {
+
+  updateCustomerEventStatus: async (req, res) => {
     try {
       const body = {
         ...req.body,
@@ -194,7 +195,7 @@ module.exports = {
         ...req,
         authAccount: req.account_id,
       };
-      const updatedEvent = await eventService.adminUpdateCustomerStatus(body);
+      const updatedEvent = await eventService.updateCustomerStatus(body);
       if (updatedEvent)
         return helper.apiResponse(
           res,
@@ -214,7 +215,7 @@ module.exports = {
     }
   },
 
-  adminUpdateVendorStatus: async (req, res) => {
+  updateVendorEventStatus: async (req, res) => {
     try {
       const body = {
         ...req.body,
@@ -222,7 +223,7 @@ module.exports = {
         ...req,
         authAccount: req.account_id,
       };
-      const updatedEvent = await eventService.adminUpdateVendorStatus(body);
+      const updatedEvent = await eventService.updateVendorStatus(body);
       if (updatedEvent)
         return helper.apiResponse(
           res,
