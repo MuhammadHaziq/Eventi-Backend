@@ -160,8 +160,9 @@ module.exports = {
   },
 
   vendorJoinEvent: async (req, res) => {
+    console.log("Req body data .....",req.body);
     try {
-      const body = {
+      const body = {  
         ...req.body,
         ...req.params,
         ...req,
