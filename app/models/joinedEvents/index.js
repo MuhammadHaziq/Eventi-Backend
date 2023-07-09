@@ -56,12 +56,21 @@ VendorJoinedEventsSchema.virtual("event_detail", {
   justOne: true,
 });
 
+VendorJoinedEventsSchema.virtual("product_images", {
+  ref: "Product",
+  localField: "products.product_id",
+  foreignField: "_id",
+  justOne: false,
+});
+
 VendorJoinedEventsSchema.pre("find", function () {
   this.populate("event_detail");
+  this.populate("product_images", "product_images");
 });
 
 VendorJoinedEventsSchema.pre("findOne", function () {
   this.populate("event_detail");
+  this.populate("product_images", "product_images");
 });
 
 module.exports = mongoose.model("VendorJoinedEvents", VendorJoinedEventsSchema);
