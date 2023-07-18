@@ -9,13 +9,13 @@ module.exports = {
         return helper.apiResponse(
           res,
           false,
-          "Event Joined Successfully",
+          "Event Join Request Successfully",
           newJoined
         );
       return helper.apiResponse(
         res,
         true,
-        "Event Not Joined Successfully",
+        "Join Request not Successfully",
         null
       );
     } catch (err) {

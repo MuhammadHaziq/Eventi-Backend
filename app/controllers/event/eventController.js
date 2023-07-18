@@ -144,7 +144,7 @@ module.exports = {
         return helper.apiResponse(
           res,
           false,
-          "Event Status Updated Successfully",
+          "Request Approved Successfully",
           updatedEvent
         );
       return helper.apiResponse(
@@ -166,14 +166,14 @@ module.exports = {
         ...req.body,
         ...req.params,
         ...req,
-        authAccount: req.account_id,
+        authAccount: req.account_id,  
       };
       const updatedEvent = await eventService.joinEvent(body);
       if (updatedEvent)
         return helper.apiResponse(
           res,
           false,
-          "Event Status Updated Successfully",
+          "Request Approved Successfully",
           updatedEvent
         );
       return helper.apiResponse(
@@ -201,7 +201,7 @@ module.exports = {
         return helper.apiResponse(
           res,
           false,
-          "Event Status Updated Successfully",
+          "Request Approved Successfully",
           updatedEvent
         );
       return helper.apiResponse(
@@ -229,7 +229,7 @@ module.exports = {
         return helper.apiResponse(
           res,
           false,
-          "Event Status Updated Successfully",
+          "Request Approved Successfully",
           updatedEvent
         );
       return helper.apiResponse(
