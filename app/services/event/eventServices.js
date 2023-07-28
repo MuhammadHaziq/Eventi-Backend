@@ -104,11 +104,12 @@ const eventService = {
     const sorter = sort ? JSON.parse(sort) : null;
     const filters = tableFilters ? JSON.parse(tableFilters) : null;
     const startIndex = ((page || 1) - 1) * (perPage || 10);
-    const totalRecord = await Event.find(
-      eventFilters(filters, authAccount)
-    ).count();
+    /** Query Filters */
+    const eventFilter = eventFilters(filters, authAccount);
+    const totalRecord = await Event.find(eventFilter).count();
     const tableRows = helper.pagination(totalRecord, page || 1, perPage || 10);
-    const record = await Event.find(eventFilters(filters, authAccount))
+    /** Query Get Record */
+    const record = await Event.find(eventFilter)
       .sort({ [sorter?.value || "createdAt"]: sorter?.state || -1 })
       .skip(startIndex)
       .limit(perPage || 10)

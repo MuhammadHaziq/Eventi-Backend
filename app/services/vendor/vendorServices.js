@@ -134,13 +134,12 @@ module.exports = {
     const sorter = sort ? JSON.parse(sort) : null;
     const filters = tableFilters ? JSON.parse(tableFilters) : null;
     const startIndex = ((page || 1) - 1) * (perPage || 10);
-    const totalRecord = await Vendor.find(
-      vendorFilters(filters, user_type, authAccount)
-    ).count();
+    /** Query Filters */
+    const vendorFilter = vendorFilters(filters, user_type, authAccount);
+    /** Query Records */
+    const totalRecord = await Vendor.find(vendorFilter).count();
     const tableRows = helper.pagination(totalRecord, page || 1, perPage || 10);
-    const record = await Vendor.find(
-      vendorFilters(filters, user_type, authAccount)
-    )
+    const record = await Vendor.find(vendorFilter)
       .select(select)
       .sort({ [sorter?.value || "createdAt"]: sorter?.state || -1 })
       .skip(startIndex)
