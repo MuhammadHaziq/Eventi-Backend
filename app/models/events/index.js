@@ -24,7 +24,7 @@ const EventSchema = new Schema(
           type: String,
           enum: [
             "Pending",
-            "Request To Approved",
+            "Request To Join",
             "Pending For Payment",
             "Approved",
           ],
@@ -48,7 +48,7 @@ const EventSchema = new Schema(
           type: String,
           enum: [
             "Pending",
-            "Request To Approved",
+            "Request To Join",
             "Pending For Payment",
             "Approved",
           ],

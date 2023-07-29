@@ -1,4 +1,3 @@
-const appConfig = require("../../../config/appConfig");
 const JoinedEvent = require("../../models/joinedEvents");
 const eventService = require("../event/eventServices");
 const ObjectId = require("mongoose").Types.ObjectId;
