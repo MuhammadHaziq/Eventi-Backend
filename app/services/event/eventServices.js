@@ -293,7 +293,7 @@ const eventService = {
           },
         }
       );
-    } else if (status === "Request To Approved") {
+    } else if (status === "Request To Join") {
       return await Event.updateOne(
         { _id: new ObjectId(eventId) },
         {
@@ -331,7 +331,7 @@ const eventService = {
           },
         }
       );
-    } else if (status === "Request To Approved") {
+    } else if (status === "Request To Join") {
       return await Event.updateOne(
         { _id: new ObjectId(eventId) },
         {
@@ -370,7 +370,7 @@ const eventService = {
           },
         }
       );
-    } else if (status === "Request To Approved") {
+    } else if (status === "Request To Join") {
       return await Event.updateOne(
         { _id: new ObjectId(eventId) },
         {
