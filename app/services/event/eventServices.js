@@ -4,6 +4,7 @@ const {
   removeFiles,
   removeAllFiles,
 } = require("../../../utils/fileHandler");
+const Payment = require("../../models/payment");
 const ObjectId = require("mongoose").Types.ObjectId;
 const error = new Error();
 error.status = "NOT_FOUND";
@@ -357,6 +358,45 @@ const eventService = {
         }
       );
     }
+  },
+
+  approvedCustomerStatus: async (body) => {
+    const {
+      authAccount,
+      eventId,
+      status,
+      customer_id,
+      amount,
+      currency,
+      payment_id,
+    } = body;
+    if (status === "Approved") {
+      const addPayment = new Payment({
+        account_id: customer_id,
+        event_id: eventId,
+        amount: amount,
+        currency: currency,
+        payment_id: payment_id,
+        updated_by: authAccount,
+      });
+      await addPayment.save();
+      return await Event.updateOne(
+        {
+          _id: new ObjectId(eventId),
+          "joined_customers.customer_id": new ObjectId(customer_id),
+        },
+        {
+          $set: {
+            "joined_customers.$.event_status": status,
+            "joined_customers.$.approved_by": new ObjectId(authAccount),
+          },
+        }
+      );
+    }
+    error.status = "BAD_REQUEST";
+    error.message = "Status Not Updated";
+    error.data = null;
+    throw error;
   },
 
   updateVendorStatus: async (body) => {

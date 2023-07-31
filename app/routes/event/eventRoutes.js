@@ -18,6 +18,9 @@ router
   .route("/update-customer-status/:eventId/:customer_id")
   .put(authMiddleware, eventController.updateCustomerEventStatus);
 router
+  .route("/approved-customer-status/:eventId/:customer_id")
+  .put(authMiddleware, eventController.approvedCustomerEventStatus);
+router
   .route("/update-vendor-status/:eventId/:vendor_id")
   .put(authMiddleware, eventController.updateVendorEventStatus);
 module.exports = {

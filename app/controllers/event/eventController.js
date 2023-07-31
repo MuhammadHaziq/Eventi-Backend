@@ -160,13 +160,13 @@ module.exports = {
   },
 
   vendorJoinEvent: async (req, res) => {
-    console.log("Req body data .....",req.body);
+    console.log("Req body data .....", req.body);
     try {
-      const body = {  
+      const body = {
         ...req.body,
         ...req.params,
         ...req,
-        authAccount: req.account_id,  
+        authAccount: req.account_id,
       };
       const updatedEvent = await eventService.joinEvent(body);
       if (updatedEvent)
@@ -197,6 +197,34 @@ module.exports = {
         authAccount: req.account_id,
       };
       const updatedEvent = await eventService.updateCustomerStatus(body);
+      if (updatedEvent)
+        return helper.apiResponse(
+          res,
+          false,
+          "Request Approved Successfully",
+          updatedEvent
+        );
+      return helper.apiResponse(
+        res,
+        true,
+        "Event Status Not Updated Successfully",
+        null
+      );
+    } catch (err) {
+      const statusCode = err.status || "INTERNAL_SERVER_ERROR";
+      return helper.apiResponse(res, true, err.message, null, statusCode);
+    }
+  },
+
+  approvedCustomerEventStatus: async (req, res) => {
+    try {
+      const body = {
+        ...req.body,
+        ...req.params,
+        ...req,
+        authAccount: req.account_id,
+      };
+      const updatedEvent = await eventService.approvedCustomerStatus(body);
       if (updatedEvent)
         return helper.apiResponse(
           res,
