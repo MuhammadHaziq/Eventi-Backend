@@ -23,6 +23,10 @@ router
 router
   .route("/update-vendor-status/:eventId/:vendor_id")
   .put(authMiddleware, eventController.updateVendorEventStatus);
+router
+  .route("/approved-vendor-status/:eventId/:vendor_id")
+  .put(authMiddleware, eventController.approvedVendorEventStatus);
+
 module.exports = {
   router: router,
   basePath: "event",

@@ -271,4 +271,32 @@ module.exports = {
       return helper.apiResponse(res, true, err.message, null, statusCode);
     }
   },
+
+  approvedVendorEventStatus: async (req, res) => {
+    try {
+      const body = {
+        ...req.body,
+        ...req.params,
+        ...req,
+        authAccount: req.account_id,
+      };
+      const updatedEvent = await eventService.approvedVendorStatus(body);
+      if (updatedEvent)
+        return helper.apiResponse(
+          res,
+          false,
+          "Request Approved Successfully",
+          updatedEvent
+        );
+      return helper.apiResponse(
+        res,
+        true,
+        "Event Status Not Updated Successfully",
+        null
+      );
+    } catch (err) {
+      const statusCode = err.status || "INTERNAL_SERVER_ERROR";
+      return helper.apiResponse(res, true, err.message, null, statusCode);
+    }
+  },
 };

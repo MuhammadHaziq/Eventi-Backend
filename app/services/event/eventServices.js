@@ -437,6 +437,45 @@ const eventService = {
       );
     }
   },
+
+  approvedVendorStatus: async (body) => {
+    const {
+      authAccount,
+      eventId,
+      status,
+      vendor_id,
+      amount,
+      currency,
+      payment_id,
+    } = body;
+    if (status === "Approved") {
+      const addPayment = new Payment({
+        account_id: vendor_id,
+        event_id: eventId,
+        amount: amount,
+        currency: currency,
+        payment_id: payment_id,
+        updated_by: authAccount,
+      });
+      await addPayment.save();
+      return await Event.updateOne(
+        {
+          _id: new ObjectId(eventId),
+          "joined_vendors.vendor_id": new ObjectId(vendor_id),
+        },
+        {
+          $set: {
+            "joined_vendors.$.event_status": status,
+            "joined_vendors.$.approved_by": new ObjectId(authAccount),
+          },
+        }
+      );
+    }
+    error.status = "BAD_REQUEST";
+    error.message = "Status Not Updated";
+    error.data = null;
+    throw error;
+  },
 };
 
 module.exports = eventService;
