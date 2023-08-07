@@ -381,17 +381,30 @@ const eventService = {
       });
       await addPayment.save();
       return await Event.updateOne(
+        { _id: new ObjectId(eventId) },
         {
-          _id: new ObjectId(eventId),
-          "joined_customers.customer_id": new ObjectId(customer_id),
-        },
-        {
-          $set: {
-            "joined_customers.$.event_status": status,
-            "joined_customers.$.approved_by": new ObjectId(authAccount),
+          $push: {
+            joined_customers: {
+              customer_id: new ObjectId(customer_id),
+              event_status: status,
+              approved_by: new ObjectId(authAccount),
+            },
           },
         }
       );
+      // return await Event.findOneAndUpdate(
+      //   {
+      //     _id: new ObjectId(eventId),
+      //     "joined_customers.customer_id": new ObjectId(customer_id),
+      //   },
+      //   {
+      //     $set: {
+      //       "joined_customers.$.event_status": status,
+      //       "joined_customers.$.approved_by": new ObjectId(authAccount),
+      //     },
+      //   },
+      //   { upsert: true }
+      // );
     }
     error.status = "BAD_REQUEST";
     error.message = "Status Not Updated";
