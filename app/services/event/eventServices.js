@@ -18,6 +18,7 @@ const eventFilters = (filters, authAccount) => {
     } else {
       delete filters.event_name;
     }
+    
     if (filters.event_location) {
       filters.event_location = {
         $regex: filters.event_location,
@@ -48,7 +49,8 @@ const eventService = {
   addEvent: async (body) => {
     const {
       event_name,
-      event_date,
+      event_start_date,
+      event_end_date,
       amount,
       event_location,
       type_of_event,
@@ -63,7 +65,8 @@ const eventService = {
       const addEvent = new Event({
         created_by: authAccount,
         event_name,
-        event_date,
+        event_start_date,
+        event_end_date,
         amount,
         event_location,
         type_of_event,
@@ -101,14 +104,25 @@ const eventService = {
   },
 
   getEvents: async (body) => {
-    const { authAccount, perPage, page, tableFilters, sort } = body;
+    const { authAccount, perPage, page, tableFilters, sort, status } = body;
+    console.log(status)
+    console.log(typeof status)
     const sorter = sort ? JSON.parse(sort) : null;
     const filters = tableFilters ? JSON.parse(tableFilters) : null;
     const startIndex = ((page || 1) - 1) * (perPage || 10);
     /** Query Filters */
-    const eventFilter = eventFilters(filters, authAccount);
+    let eventFilter = eventFilters(filters, authAccount);
     const totalRecord = await Event.find(eventFilter).count();
     const tableRows = helper.pagination(totalRecord, page || 1, perPage || 10);
+    if (status) {
+      eventFilter = {
+        ...eventFilter,
+        joined_vendors: { $elemMatch: { event_status: status } }
+      }
+    } else {
+      delete eventFilter.joined_vendors;
+    }
+    console.log(JSON.stringify(eventFilter))
     /** Query Get Record */
     const record = await Event.find(eventFilter)
       .sort({ [sorter?.value || "createdAt"]: sorter?.state || -1 })
@@ -141,7 +155,8 @@ const eventService = {
       eventId,
       authAccount,
       event_name,
-      event_date,
+      event_start_date,
+      event_end_date,
       amount,
       event_location,
       type_of_event,
@@ -175,7 +190,8 @@ const eventService = {
         { _id: eventId },
         {
           event_name,
-          event_date,
+          event_start_date,
+          event_end_date,
           amount,
           event_location,
           banner_images: images,

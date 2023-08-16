@@ -76,7 +76,7 @@ const select = [
   "address",
   "age_verification",
   "gender",
-  "date_of_birth",
+  // "date_of_birth",
   "phone_number",
   "deleted_by",
   "updated_by",
@@ -95,7 +95,7 @@ module.exports = {
         email,
         address,
         phone_number,
-        date_of_birth,
+        // date_of_birth,
         gender,
         user_type,
         password,
@@ -112,7 +112,7 @@ module.exports = {
         business_name: business_name,
         address: address,
         phone_number: phone_number,
-        date_of_birth: date_of_birth,
+        // date_of_birth: date_of_birth,
         gender: gender,
       });
       await addVendor.save();
@@ -168,7 +168,7 @@ module.exports = {
       last_name,
       address,
       phone_number,
-      date_of_birth,
+      // date_of_birth,
       gender,
     } = body;
     await Account.updateOne(
@@ -186,7 +186,7 @@ module.exports = {
         last_name,
         address,
         phone_number,
-        date_of_birth,
+        // date_of_birth,
         gender,
         updated_by: authAccount,
       },

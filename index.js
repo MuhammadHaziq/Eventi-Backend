@@ -17,9 +17,11 @@ app.use(
   })
 );
 app.use(
-  cors({
+  cors(
+    {
     origin: "*",
-  })
+  }
+  )
 );
 app.use("/media", express.static(path.join(__dirname, "./uploads")));
 

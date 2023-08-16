@@ -11,6 +11,12 @@ const ProductSchema = new Schema(
       trim: true,
       default: null,
     },
+    product_points: {
+      type: Number,
+      required: false,
+      trim: true,
+      default: null,
+    },
     vendor_account_id: {
       type: Schema.Types.ObjectId,
       ref: "Account",
@@ -27,3 +33,4 @@ const ProductSchema = new Schema(
   }
 );
 module.exports = mongoose.model("Product", ProductSchema);
+ 

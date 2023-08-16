@@ -4,7 +4,7 @@ module.exports = {
   addProduct: async (req, res) => {
     try {
       const body = {
-        ...req.body,
+        ...req.body, 
         ...req.params,
         ...req,
         authAccount: req.account_id,

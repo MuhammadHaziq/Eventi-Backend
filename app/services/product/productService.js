@@ -48,6 +48,7 @@ const productService = {
       product_name,
       product_price,
       product_quantity,
+      product_points,
       authAccount,
       vendor_account_id,
     } = body;
@@ -56,6 +57,7 @@ const productService = {
         product_name,
         product_price,
         product_quantity,
+        product_points,
         vendor_account_id,
         created_by: authAccount,
       });
@@ -128,6 +130,7 @@ const productService = {
       product_name,
       product_price,
       product_quantity,
+      product_points,
       authAccount,
       product_id,
       user_type,
@@ -167,6 +170,7 @@ const productService = {
           product_name,
           product_price,
           product_quantity,
+          product_points,
           vendor_account_id,
           product_images: images,
           updated_by: authAccount,

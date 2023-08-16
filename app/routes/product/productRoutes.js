@@ -15,3 +15,4 @@ module.exports = {
   router: router,
   basePath: "product",
 };
+ 
