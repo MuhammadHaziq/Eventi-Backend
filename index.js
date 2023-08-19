@@ -23,6 +23,7 @@ app.use(
   }
   )
 );
+
 app.use("/media", express.static(path.join(__dirname, "./uploads")));
 
 require("./bootstrapApplication").bootstrap(app);
