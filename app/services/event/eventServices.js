@@ -1,4 +1,5 @@
 const Event = require("../../models/events");
+const JoinedEvent = require("../../models/joinedEvents");
 const {
   uploadImages,
   removeFiles,
@@ -18,7 +19,7 @@ const eventFilters = (filters, authAccount) => {
     } else {
       delete filters.event_name;
     }
-    
+
     if (filters.event_location) {
       filters.event_location = {
         $regex: filters.event_location,
@@ -54,6 +55,7 @@ const eventService = {
       amount,
       event_location,
       type_of_event,
+      points_percent,
       expected_attendence,
       phone_number,
       equipments,
@@ -68,6 +70,7 @@ const eventService = {
         event_start_date,
         event_end_date,
         amount,
+        points_percent,
         event_location,
         type_of_event,
         expected_attendence,
@@ -105,8 +108,8 @@ const eventService = {
 
   getEvents: async (body) => {
     const { authAccount, perPage, page, tableFilters, sort, status } = body;
-    console.log(status)
-    console.log(typeof status)
+    console.log(status);
+    console.log(typeof status);
     const sorter = sort ? JSON.parse(sort) : null;
     const filters = tableFilters ? JSON.parse(tableFilters) : null;
     const startIndex = ((page || 1) - 1) * (perPage || 10);
@@ -117,12 +120,12 @@ const eventService = {
     if (status) {
       eventFilter = {
         ...eventFilter,
-        joined_vendors: { $elemMatch: { event_status: status } }
-      }
+        joined_vendors: { $elemMatch: { event_status: status } },
+      };
     } else {
       delete eventFilter.joined_vendors;
     }
-    console.log(JSON.stringify(eventFilter))
+    console.log(JSON.stringify(eventFilter));
     /** Query Get Record */
     const record = await Event.find(eventFilter)
       .sort({ [sorter?.value || "createdAt"]: sorter?.state || -1 })
@@ -150,6 +153,23 @@ const eventService = {
     }).lean();
   },
 
+  getAllEvent: async (body) => {
+    const { eventId, user_type } = body;
+    if (user_type !== "vendor") {
+      return await Event.find({
+        deleted_by: { $eq: null },
+        $expr: { $gt: [{ $size: "$joined_customers" }, 0] },
+      })
+        .populate("joined_customers.customer_id")
+        .populate("joined_vendors.vendor_id")
+        .lean();
+    }
+    return await Event.findOne({
+      _id: new ObjectId(eventId),
+      deleted_by: { $eq: null },
+    }).lean();
+  },
+
   updateEvent: async (body) => {
     const {
       eventId,
@@ -158,6 +178,7 @@ const eventService = {
       event_start_date,
       event_end_date,
       amount,
+      points_percent,
       event_location,
       type_of_event,
       expected_attendence,
@@ -193,6 +214,7 @@ const eventService = {
           event_start_date,
           event_end_date,
           amount,
+          points_percent,
           event_location,
           banner_images: images,
           type_of_event,
@@ -299,6 +321,28 @@ const eventService = {
     }
   },
 
+  updateCustomerPoints: async (body) => {
+    const { accountId, eventId, points_available } = body;
+    console.log(
+      {
+        _id: new ObjectId(eventId),
+        "joined_customers.customer_id": new ObjectId(accountId),
+      },
+      points_available
+    );
+    return await Event.updateOne(
+      {
+        _id: new ObjectId(eventId),
+        "joined_customers.customer_id": new ObjectId(accountId),
+      },
+      {
+        $set: {
+          "joined_customers.$.points_available": points_available,
+        },
+      }
+    );
+  },
+
   customerJoinEvent: async (body) => {
     const { account_id, eventId, status } = body;
     if (status === "remove") {
@@ -382,6 +426,8 @@ const eventService = {
       eventId,
       status,
       customer_id,
+      payment_method,
+      points_available,
       amount,
       currency,
       payment_id,
@@ -391,6 +437,7 @@ const eventService = {
         account_id: customer_id,
         event_id: eventId,
         amount: amount,
+        payment_method: payment_method,
         currency: currency,
         payment_id: payment_id,
         updated_by: authAccount,
@@ -402,6 +449,7 @@ const eventService = {
           $push: {
             joined_customers: {
               customer_id: new ObjectId(customer_id),
+              points_available: points_available,
               event_status: status,
               approved_by: new ObjectId(authAccount),
             },
@@ -466,39 +514,84 @@ const eventService = {
       );
     }
   },
-
+  checkAdminVendorEventJoined: async (body) => {
+    const { eventId, vendor_id } = body;
+    return await JoinedEvent.findOne({
+      event_id: eventId,
+      account_id: vendor_id,
+    }).lean();
+  },
+  addAdminVendorJoinedEvent: async (body) => {
+    const { vendor_id, eventId, products, authAccount } = body;
+    const joinedEvent = await eventService.checkAdminVendorEventJoined(body);
+    if (!joinedEvent) {
+      await eventService.joinEvent(body);
+      const newJoinedVendor = new JoinedEvent({
+        event_id: eventId,
+        account_id: vendor_id,
+        products,
+        created_by: authAccount,
+      });
+      return await newJoinedVendor.save();
+    }
+    error.status = "VALIDATION_ERR";
+    error.message = "Event Already Joined";
+    throw error;
+  },
+  
   approvedVendorStatus: async (body) => {
     const {
+      isAdmin,
       authAccount,
       eventId,
       status,
       vendor_id,
+      payment_method,
       amount,
       currency,
       payment_id,
     } = body;
+    await eventService.addAdminVendorJoinedEvent(body);
     if (status === "Approved") {
       const addPayment = new Payment({
         account_id: vendor_id,
         event_id: eventId,
         amount: amount,
+        payment_method: payment_method,
         currency: currency,
         payment_id: payment_id,
         updated_by: authAccount,
       });
       await addPayment.save();
-      return await Event.updateOne(
-        {
-          _id: new ObjectId(eventId),
-          "joined_vendors.vendor_id": new ObjectId(vendor_id),
-        },
-        {
-          $set: {
-            "joined_vendors.$.event_status": status,
-            "joined_vendors.$.approved_by": new ObjectId(authAccount),
+      if (isAdmin) {
+        return await Event.updateOne(
+          {
+            _id: new ObjectId(eventId),
           },
-        }
-      );
+          {
+            $push: {
+              joined_vendors: {
+                vendor_id: new ObjectId(vendor_id),
+                event_status: status,
+                approved_by: new ObjectId(authAccount),
+              },
+            },
+          }
+        );
+      } else {
+        return await Event.updateOne(
+          {
+            _id: new ObjectId(eventId),
+            "joined_vendors.vendor_id": new ObjectId(vendor_id),
+          },
+          {
+            $set: {
+              "joined_vendors.$.event_status": status,
+              "joined_vendors.$.approved_by": new ObjectId(authAccount),
+            },
+          }
+        );
+      }
     }
     error.status = "BAD_REQUEST";
     error.message = "Status Not Updated";

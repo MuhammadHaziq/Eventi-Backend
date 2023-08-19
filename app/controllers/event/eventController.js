@@ -80,6 +80,29 @@ module.exports = {
     }
   },
 
+  getAllEvent: async (req, res) => {
+    try {
+      const body = { ...req.body, ...req.params, authAccount: req.account_id };
+      const event = await eventService.getAllEvent(body);
+      if (event)
+        return helper.apiResponse(
+          res,
+          false,
+          "Events Fetch Successfully",
+          event
+        );
+      return helper.apiResponse(
+        res,
+        true,
+        "Events Not Fetch Successfully",
+        null
+      );
+    } catch (err) {
+      const statusCode = err.status || "INTERNAL_SERVER_ERROR";
+      return helper.apiResponse(res, true, err.message, null, statusCode);
+    }
+  },
+
   updateEvent: async (req, res) => {
     try {
       const body = {
@@ -131,6 +154,33 @@ module.exports = {
     }
   },
 
+  updateCustomerPoints: async (req, res) => {
+    try {
+      const body = {
+        ...req.body,
+        ...req.params,
+        ...req,
+        authAccount: req.account_id,
+      };
+      const updatedEvent = await eventService.updateCustomerPoints(body);
+      if (updatedEvent)
+        return helper.apiResponse(
+          res,
+          false,
+          "Request Approved Successfully",
+          updatedEvent
+        );
+      return helper.apiResponse(
+        res,
+        true,
+        "Event Status Not Updated Successfully",
+        null
+      );
+    } catch (err) {
+      const statusCode = err.status || "INTERNAL_SERVER_ERROR";
+      return helper.apiResponse(res, true, err.message, null, statusCode);
+    }
+  },
   customerJoinEvent: async (req, res) => {
     try {
       const body = {
@@ -285,7 +335,7 @@ module.exports = {
         return helper.apiResponse(
           res,
           false,
-          "Request Approved Successfully",
+          body.isAdmin ? "Event Joined Successfully" : "Request Approved Successfully",
           updatedEvent
         );
       return helper.apiResponse(

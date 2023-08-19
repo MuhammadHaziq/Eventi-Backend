@@ -14,6 +14,7 @@ const EventSchema = new Schema(
     phone_number: { type: String, trim: true, required: true },
     equipments: { type: String, trim: true, required: true },
     security: { type: String, required: true, default: false },
+    points_percent: { type: Number, required: true, default: 0, min: 1, max: 100 },
     joined_customers: [
       {
         customer_id: {
@@ -21,6 +22,7 @@ const EventSchema = new Schema(
           ref: "Account",
           default: null,
         },
+        points_available: { type: Number, required: true, default: 0 },
         event_status: {
           type: String,
           enum: [

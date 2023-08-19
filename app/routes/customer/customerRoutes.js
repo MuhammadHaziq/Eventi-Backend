@@ -11,6 +11,7 @@ router
 router
   .route("/:account_id")
   .put(authMiddleware, customerController.updateCustomer);
+  
 router
   .route("/:account_id")
   .delete(authMiddleware, customerController.deleteCustomer);

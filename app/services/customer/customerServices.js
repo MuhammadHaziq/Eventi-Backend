@@ -1,4 +1,5 @@
 const Customer = require("../../models/customers");
+const Event = require("../../models/events");
 const Account = require("../../models/accounts");
 const ObjectId = require("mongoose").Types.ObjectId;
 

@@ -8,6 +8,16 @@ const PaymentSchema = new Schema(
       ref: "Event",
       required: true,
     },
+    payment_method: {
+      type: String,
+      enum: [
+        "",
+        "Cash",
+        "Paystack"
+      ],
+      default: "",
+      required: false,
+    },
     amount: { type: String, required: true, trim: true, required: true },
     currency: { type: String, required: true, trim: true, required: true },
     payment_id: { type: String, required: true, trim: true, required: true },

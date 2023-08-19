@@ -28,7 +28,7 @@ const productFilters = (filters, user_type, authAccount) => {
   }
 
   if (user_type !== "admin") {
-    filters = { created_by: authAccount };
+    filters = { vendor_account_id: authAccount };
   }
 
   return { ...filters, deleted_by: { $eq: null } };
@@ -94,6 +94,7 @@ const productService = {
       authAccount,
       perPage,
       page,
+      join_vendor_id,
       tableFilters,
       sort,
       user_type,
@@ -107,6 +108,13 @@ const productService = {
     const totalRecord = await Product.find(productFilter).count();
     const startIndex = ((page || 1) - 1) * (perPage || 10);
     const tableRows = helper.pagination(totalRecord, page || 1, perPage || 10);
+    
+    if(join_vendor_id){
+      productFilter.vendor_account_id = join_vendor_id
+    } else {
+      delete productFilter.vendor_account_id
+    }
+    console.log(productFilter)
     const record = await Product.find(productFilter)
       .sort({ [sorter?.value || "createdAt"]: sorter?.state || -1 })
       .skip(startIndex)

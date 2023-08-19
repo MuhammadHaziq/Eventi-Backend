@@ -5,12 +5,16 @@ const authMiddleware = require("../../middleware/authMiddleware");
 
 router.route("/").post(authMiddleware, eventController.addEvent);
 router.route("/").get(authMiddleware, eventController.getEvents);
+router.route("/allevents").get(authMiddleware, eventController.getAllEvent);
 router.route("/:eventId").get(authMiddleware, eventController.getEvent);
 router.route("/:eventId").put(authMiddleware, eventController.updateEvent);
 router.route("/:eventId").delete(authMiddleware, eventController.deleteEvent);
 router
   .route("/:eventId/:account_id")
   .put(authMiddleware, eventController.customerJoinEvent);
+router
+  .route("/updatepoints")
+  .post(authMiddleware, eventController.updateCustomerPoints);
 router
   .route("/vendor-event-update/:eventId/:account_id")
   .put(authMiddleware, eventController.vendorJoinEvent);
