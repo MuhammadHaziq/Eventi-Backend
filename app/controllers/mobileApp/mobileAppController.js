@@ -11,6 +11,7 @@ module.exports = {
         authAccount: req.account_id
       };
       const response = await mobileAppService.getVendorEventProducts(body);
+      console.log(body);
       if (response && response.length > 0)
         return helper.apiResponse(
           res,

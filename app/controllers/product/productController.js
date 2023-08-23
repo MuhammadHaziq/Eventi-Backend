@@ -58,7 +58,7 @@ module.exports = {
       const body = {
         ...req.body,
         ...req.params,
-        authAccount: req.account_id,
+        authAccount: req.account_id, 
         user_type: req.user.user_type,
       };
       const product = await productService.getProduct(body);

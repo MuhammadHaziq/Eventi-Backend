@@ -7,6 +7,7 @@ const customerNav = [
   { permission: "event-detail" },
   { permission: "view-profile" },
   { permission: "edit-profile" },
+  { permission: "ticket" },
 ];
 
 const vendorNav = [

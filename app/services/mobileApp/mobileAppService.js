@@ -45,12 +45,14 @@ const mobileAppService = {
   },
   getVendorEventProducts: async (body) => {
     const { event_id, vendor_id } = body;
+
     const response = await JoinedEvents.find({
       event_id: new ObjectId(event_id),
       account_id: new ObjectId(vendor_id),
       deleted_at: { $eq: null },
     }).populate("products.product_id");
     const products = [];
+    console.log(response);
     if (response) {
       response.map((joinedEvent) => {
         return joinedEvent.products.map((product) => {
