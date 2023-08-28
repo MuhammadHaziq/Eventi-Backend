@@ -124,11 +124,11 @@ module.exports = {
         user_type: req.user.user_type,
       };
       const getCustPayment = await customerService.getCustPaymentHistory(body);
-      if (getCustPayment)
+      if (getCustPayment && getCustPayment?.length > 0)
         return helper.apiResponse(
           res,
           false,
-          "Customer Payment History Successfully",
+          "Customer Payment History Available",
           getCustPayment
         );
       return helper.apiResponse(res, true, "No History Found", null);
