@@ -14,7 +14,24 @@ const EventSchema = new Schema(
     phone_number: { type: String, trim: true, required: true },
     equipments: { type: String, trim: true, required: true },
     security: { type: String, required: true, default: false },
-    points_percent: { type: Number, required: true, default: 0, min: 1, max: 100 },
+    points_percent: {
+      type: Number,
+      required: true,
+      default: 0,
+      min: 1,
+      max: 100,
+    },
+    no_of_tickets: {
+      type: Number,
+      required: true,
+      default: 1,
+      min: 1,
+    },
+    no_of_tickets_sold: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
     joined_customers: [
       {
         customer_id: {

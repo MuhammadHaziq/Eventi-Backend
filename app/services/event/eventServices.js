@@ -61,6 +61,7 @@ const eventService = {
       equipments,
       security,
       special_request,
+      no_of_tickets,
       authAccount,
     } = body;
     try {
@@ -77,6 +78,7 @@ const eventService = {
         phone_number,
         equipments,
         security,
+        no_of_tickets,
         special_request,
       });
 
@@ -538,7 +540,7 @@ const eventService = {
     error.message = "Event Already Joined - Admin Vendor";
     throw error;
   },
-  
+
   approvedVendorStatus: async (body) => {
     const {
       isAdmin,
