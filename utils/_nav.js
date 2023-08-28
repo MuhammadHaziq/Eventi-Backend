@@ -8,6 +8,7 @@ const customerNav = [
   { permission: "view-profile" },
   { permission: "edit-profile" },
   { permission: "ticket" },
+  { permission: "customer-payment-history" },
 ];
 
 const vendorNav = [
