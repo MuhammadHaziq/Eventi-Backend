@@ -15,6 +15,9 @@ router
 router
 .route("/:account_id")
 .delete(authMiddleware, customerController.deleteCustomer);
+router
+.route("/custPaymentHistory/:account_id")
+.get(authMiddleware, customerController.getCustPaymentHistory);
 
 module.exports = {
   router: router,

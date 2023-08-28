@@ -115,4 +115,28 @@ module.exports = {
       return helper.apiResponse(res, true, err.message, null, statusCode);
     }
   },
+  getCustPaymentHistory: async (req, res) => {
+    try {
+      const body = {
+        ...req.body,
+        ...req.params,
+        authAccount: req.account_id,
+        user_type: req.user.user_type,
+      };
+      const getCustPayment = await customerService.getCustPaymentHistory(body);
+      if (getCustPayment)
+        return helper.apiResponse(
+          res,
+          false,
+          "Customer Payment History Successfully",
+          getCustPayment
+        );
+      return helper.apiResponse(res, true, "No History Found", null);
+    } catch (err) {
+      const statusCode = err.status || "INTERNAL_SERVER_ERROR";
+      return helper.apiResponse(res, true, err.message, null, statusCode);
+    }
+  },
+  
+
 };
