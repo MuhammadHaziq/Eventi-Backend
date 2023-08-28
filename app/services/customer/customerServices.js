@@ -240,7 +240,6 @@ const customerService = {
     }).sort({ [sorter?.value || "createdAt"]: sorter?.state || -1 })
     .populate("event_id")
     .populate("account_id");
-      // .lean();
   },
   checkCustomer: async (email) => {
     return await Customer.findOne({
