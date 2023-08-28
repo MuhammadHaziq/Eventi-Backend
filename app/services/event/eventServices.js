@@ -535,7 +535,7 @@ const eventService = {
       return await newJoinedVendor.save();
     }
     error.status = "VALIDATION_ERR";
-    error.message = "Event Already Joined";
+    error.message = "Event Already Joined - Admin Vendor";
     throw error;
   },
   
@@ -551,7 +551,7 @@ const eventService = {
       currency,
       payment_id,
     } = body;
-    await eventService.addAdminVendorJoinedEvent(body);
+    // await eventService.addAdminVendorJoinedEvent(body);
     if (status === "Approved") {
       const addPayment = new Payment({
         account_id: vendor_id,
