@@ -1,6 +1,6 @@
 const customerService = require("../customer/customerServices");
 const vendorService = require("../vendor/vendorServices");
-const Attende = require("../../models/attendess");
+const Attendess = require("../../models/attendess");
 const { adminNav, vendorNav, customerNav } = require("../../../utils/_nav");
 const adminService = require("../admin/adminService");
 const ObjectId = require("mongoose").Types.ObjectId;
@@ -13,7 +13,7 @@ error.data = null;
 const accountService = {
   addAttende: async (body) => {
     try {
-      const addAttende = new Attende({
+      const addAttende = new Attendess({
         first_name: body.first_name,
         last_name: body.last_name,
         email: body.email,
@@ -31,7 +31,7 @@ const accountService = {
 
   getAttendess: async () => {
     const { authAccount } = body;
-    return await Attende.find({
+    return await Attendess.find({
       deleted_by: { $eq: null },
       account_id: authAccount,
     }).lean();
