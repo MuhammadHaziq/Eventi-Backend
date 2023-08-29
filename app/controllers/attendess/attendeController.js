@@ -40,12 +40,7 @@ module.exports = {
           "Attendess Fetch Successfully",
           users
         );
-      return helper.apiResponse(
-        res,
-        true,
-        "Attendess Not Fetch Successfully",
-        null
-      );
+      return helper.apiResponse(res, true, "Attendess Not Found", null);
     } catch (err) {
       const statusCode = err.status || "INTERNAL_SERVER_ERROR";
       return helper.apiResponse(res, true, err.message, null, statusCode);
@@ -68,12 +63,7 @@ module.exports = {
           "Attende Fetch Successfully",
           user
         );
-      return helper.apiResponse(
-        res,
-        true,
-        "Attende Not Fetch Successfully",
-        null
-      );
+      return helper.apiResponse(res, true, "Attende Not Found", null);
     } catch (err) {
       const statusCode = err.status || "INTERNAL_SERVER_ERROR";
       return helper.apiResponse(res, true, err.message, null, statusCode);
