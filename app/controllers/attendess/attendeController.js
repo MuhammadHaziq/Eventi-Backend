@@ -4,7 +4,7 @@ module.exports = {
   addAttende: async (req, res) => {
     try {
       const body = { ...req.body, ...req.params };
-      const newAttende = await attendeService.addUser(body);
+      const newAttende = await attendeService.addAttende(body);
       if (newAttende)
         return helper.apiResponse(
           res,
@@ -32,7 +32,7 @@ module.exports = {
         authAccount: req.account_id,
         user_type: req.user.user_type,
       };
-      const users = await attendeService.getUsers(body);
+      const users = await attendeService.getAttendess(body);
       if (users && users?.length > 0)
         return helper.apiResponse(
           res,
@@ -60,7 +60,7 @@ module.exports = {
         authAccount: req.account_id,
         user_type: req.user.user_type,
       };
-      const user = await attendeService.getUser(body);
+      const user = await attendeService.getAttende(body);
       if (user)
         return helper.apiResponse(
           res,
