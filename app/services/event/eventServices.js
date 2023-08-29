@@ -1,5 +1,6 @@
 const Event = require("../../models/events");
 const JoinedEvent = require("../../models/joinedEvents");
+const Attendess = require("../../models/attendess");
 const {
   uploadImages,
   removeFiles,
@@ -61,6 +62,7 @@ const eventService = {
       equipments,
       security,
       special_request,
+      no_of_tickets,
       authAccount,
     } = body;
     try {
@@ -77,6 +79,7 @@ const eventService = {
         phone_number,
         equipments,
         security,
+        no_of_tickets,
         special_request,
       });
 
@@ -431,45 +434,59 @@ const eventService = {
       amount,
       currency,
       payment_id,
+      attendess,
+      no_of_tickets_sold,
     } = body;
-    if (status === "Approved") {
-      const addPayment = new Payment({
-        account_id: customer_id,
-        event_id: eventId,
-        amount: amount,
-        payment_method: payment_method,
-        currency: currency,
-        payment_id: payment_id,
-        updated_by: authAccount,
-      });
-      await addPayment.save();
-      return await Event.updateOne(
-        { _id: new ObjectId(eventId) },
-        {
-          $push: {
-            joined_customers: {
-              customer_id: new ObjectId(customer_id),
-              points_available: points_available,
-              event_status: status,
-              approved_by: new ObjectId(authAccount),
-            },
-          },
+    try {
+      if (status === "Approved") {
+        const addPayment = new Payment({
+          account_id: customer_id,
+          event_id: eventId,
+          amount: amount,
+          payment_method: payment_method,
+          currency: currency,
+          payment_id: payment_id,
+          updated_by: authAccount,
+        });
+        await addPayment.save();
+        if (JSON.parse(attendess)?.length > 0) {
+          await Attendess.insertMany(JSON.parse(attendess));
         }
-      );
-      // return await Event.findOneAndUpdate(
-      //   {
-      //     _id: new ObjectId(eventId),
-      //     "joined_customers.customer_id": new ObjectId(customer_id),
-      //   },
-      //   {
-      //     $set: {
-      //       "joined_customers.$.event_status": status,
-      //       "joined_customers.$.approved_by": new ObjectId(authAccount),
-      //     },
-      //   },
-      //   { upsert: true }
-      // );
+        return await Event.updateOne(
+          { _id: new ObjectId(eventId) },
+          {
+            no_of_tickets_sold: no_of_tickets_sold || 1,
+            $push: {
+              joined_customers: {
+                customer_id: new ObjectId(customer_id),
+                points_available: points_available,
+                event_status: status,
+                approved_by: new ObjectId(authAccount),
+              },
+            },
+          }
+        );
+        // return await Event.findOneAndUpdate(
+        //   {
+        //     _id: new ObjectId(eventId),
+        //     "joined_customers.customer_id": new ObjectId(customer_id),
+        //   },
+        //   {
+        //     $set: {
+        //       "joined_customers.$.event_status": status,
+        //       "joined_customers.$.approved_by": new ObjectId(authAccount),
+        //     },
+        //   },
+        //   { upsert: true }
+        // );
+      }
+    } catch (err) {
+      error.status = "BAD_REQUEST";
+      error.message = err.message;
+      error.data = null;
+      throw error;
     }
+
     error.status = "BAD_REQUEST";
     error.message = "Status Not Updated";
     error.data = null;
@@ -538,7 +555,7 @@ const eventService = {
     error.message = "Event Already Joined - Admin Vendor";
     throw error;
   },
-  
+
   approvedVendorStatus: async (body) => {
     const {
       isAdmin,
