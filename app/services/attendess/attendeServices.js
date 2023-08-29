@@ -29,7 +29,7 @@ const accountService = {
     }
   },
 
-  getAttendess: async () => {
+  getAttendess: async (body) => {
     const { authAccount } = body;
     return await Attendess.find({
       deleted_by: { $eq: null },
@@ -38,9 +38,9 @@ const accountService = {
   },
 
   getAttende: async (body) => {
-    const { _id } = body;
+    const { attende_id } = body;
     return await Account.findOne({
-      _id: new ObjectId(_id),
+      _id: new ObjectId(attende_id),
       deleted_by: { $eq: null },
     }).lean();
   },
