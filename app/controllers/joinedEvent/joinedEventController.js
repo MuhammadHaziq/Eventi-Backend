@@ -47,48 +47,6 @@ module.exports = {
     }
   },
 
-  //   getProducts: async (req, res) => {
-  //     try {
-  //       const body = {
-  //         ...req.body,
-  //         ...req.params,
-  //         ...req.query,
-  //         authAccount: req.account_id,
-  //         user_type: req.user.user_type,
-  //       };
-  //       const products = await productService.getProducts(body);
-  //       if (products && products?.data?.length > 0)
-  //         return helper.apiResponse(
-  //           res,
-  //           false,
-  //           "Products Fetch Successfully",
-  //           products
-  //         );
-  //       return helper.apiResponse(res, true, "No Products Found", null);
-  //     } catch (err) {
-  //       const statusCode = err.status || "INTERNAL_SERVER_ERROR";
-  //       return helper.apiResponse(res, true, err.message, null, statusCode);
-  //     }
-  //   },
-
-  //   getProduct: async (req, res) => {
-  //     try {
-  //       const body = { ...req.body, ...req.params, authAccount: req.account_id };
-  //       const product = await productService.getProduct(body);
-  //       if (product)
-  //         return helper.apiResponse(
-  //           res,
-  //           false,
-  //           "Product Fetch Successfully",
-  //           product
-  //         );
-  //       return helper.apiResponse(res, true, "No Product Found", null);
-  //     } catch (err) {
-  //       const statusCode = err.status || "INTERNAL_SERVER_ERROR";
-  //       return helper.apiResponse(res, true, err.message, null, statusCode);
-  //     }
-  //   },
-
   updateJoinedEvent: async (req, res) => {
     try {
       const body = { ...req.body, ...req.params, authAccount: req.account_id };
