@@ -235,13 +235,63 @@ const customerService = {
   getCustPaymentHistory: async (body) => {
     const { sort, user_type, authAccount, account_id } = body;
     const sorter = sort ? JSON.parse(sort) : null;
-    return await Payment.find({
-      account_id: new ObjectId(account_id),
-      deleted_by: { $eq: null },
-    })
-      .sort({ [sorter?.value || "createdAt"]: sorter?.state || -1 })
-      .populate("event_id")
-      .populate("account_id");
+    return await Payment.aggregate([
+      [
+        {
+          $lookup: {
+            from: "attendesses",
+            localField: "event_id",
+            foreignField: "event_id",
+            as: "attendes",
+          },
+        },
+        {
+          $match: {
+            "attendes.account_id": new ObjectId(account_id),
+          },
+        },
+        {
+          $lookup: {
+            from: "events",
+            localField: "event_id",
+            foreignField: "_id",
+            as: "event_id",
+          },
+        },
+        {
+          $unwind: {
+            path: "$event_id",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $lookup: {
+            from: "accounts",
+            localField: "account_id",
+            foreignField: "_id",
+            as: "account_id",
+          },
+        },
+        {
+          $unwind: {
+            path: "$account_id",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $sort: {
+            [sorter?.value || "createdAt"]: sorter?.state || -1,
+          },
+        },
+      ],
+    ]);
+    // return await Payment.find({
+    //   account_id: new ObjectId(account_id),
+    //   deleted_by: { $eq: null },
+    // })
+    //   .sort({ [sorter?.value || "createdAt"]: sorter?.state || -1 })
+    //   .populate("event_id")
+    //   .populate("account_id");
   },
 
   checkCustomer: async (email) => {
