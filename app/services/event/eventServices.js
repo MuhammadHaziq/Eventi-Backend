@@ -450,7 +450,11 @@ const eventService = {
         });
         await addPayment.save();
         if (JSON.parse(attendess)?.length > 0) {
-          await Attendess.insertMany(JSON.parse(attendess));
+          await Attendess.insertMany(
+            JSON.parse(attendess)?.map((item) => {
+              return { ...item, event_id: eventId };
+            })
+          );
         }
         return await Event.updateOne(
           { _id: new ObjectId(eventId) },

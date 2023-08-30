@@ -39,8 +39,17 @@ const accountService = {
 
   getAttende: async (body) => {
     const { attende_id } = body;
-    return await Account.findOne({
+    return await Attendess.findOne({
       _id: new ObjectId(attende_id),
+      deleted_by: { $eq: null },
+    }).lean();
+  },
+
+  getAccountAttende: async (body) => {
+    const { event_id, account_id } = body;
+    return await Attendess.find({
+      event_id: new ObjectId(event_id),
+      account_id: new ObjectId(account_id),
       deleted_by: { $eq: null },
     }).lean();
   },

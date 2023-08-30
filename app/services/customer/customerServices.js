@@ -231,21 +231,24 @@ const customerService = {
     }
     return false;
   },
- getCustPaymentHistory: async (body) => {
-   const { sort, user_type, authAccount, account_id } = body;
-   const sorter = sort ? JSON.parse(sort) : null;
+
+  getCustPaymentHistory: async (body) => {
+    const { sort, user_type, authAccount, account_id } = body;
+    const sorter = sort ? JSON.parse(sort) : null;
     return await Payment.find({
       account_id: new ObjectId(account_id),
       deleted_by: { $eq: null },
-    }).sort({ [sorter?.value || "createdAt"]: sorter?.state || -1 })
-    .populate("event_id")
-    .populate("account_id");
+    })
+      .sort({ [sorter?.value || "createdAt"]: sorter?.state || -1 })
+      .populate("event_id")
+      .populate("account_id");
   },
+
   checkCustomer: async (email) => {
     return await Customer.findOne({
       email: email,
       deleted_by: { $eq: null },
     }).count();
   },
-}; 
+};
 module.exports = customerService;

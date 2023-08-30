@@ -48,7 +48,7 @@ module.exports = {
       return helper.apiResponse(res, true, err.message, null, statusCode);
     }
   },
-  
+
   getCustomer: async (req, res) => {
     try {
       const body = {
@@ -115,6 +115,7 @@ module.exports = {
       return helper.apiResponse(res, true, err.message, null, statusCode);
     }
   },
+
   getCustPaymentHistory: async (req, res) => {
     try {
       const body = {
@@ -137,6 +138,4 @@ module.exports = {
       return helper.apiResponse(res, true, err.message, null, statusCode);
     }
   },
-  
-
 };

@@ -69,4 +69,27 @@ module.exports = {
       return helper.apiResponse(res, true, err.message, null, statusCode);
     }
   },
+
+  getAccountAttendess: async (req, res) => {
+    try {
+      const body = {
+        ...req.body,
+        ...req.params,
+        authAccount: req.account_id,
+        user_type: req.user.user_type,
+      };
+      const users = await attendeService.getAccountAttende(body);
+      if (users && users?.length > 0)
+        return helper.apiResponse(
+          res,
+          false,
+          "Attendess Fetch Successfully",
+          users
+        );
+      return helper.apiResponse(res, true, "Attendess Not Found", null);
+    } catch (err) {
+      const statusCode = err.status || "INTERNAL_SERVER_ERROR";
+      return helper.apiResponse(res, true, err.message, null, statusCode);
+    }
+  },
 };

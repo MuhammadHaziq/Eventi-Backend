@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const AttendeSchema = new Schema(
   {
     account_id: { type: Schema.Types.ObjectId, ref: "Account", required: true },
+    event_id: { type: Schema.Types.ObjectId, ref: "Event", required: true },
     first_name: { type: String, required: true, trim: true, index: true },
     last_name: { type: String, required: true, trim: true },
     // unique: true
