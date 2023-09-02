@@ -16,6 +16,7 @@ const CustomerSchema = new Schema(
     gender: { type: String, enum: ["Male", "Female", "Other"], required: true },
     date_of_birth: { type: String, trim: true },
     phone_number: { type: String, trim: true, required: true },
+    attende_id: { type: Schema.Types.ObjectId, ref: "Attendess" },
     deleted_by: { type: Schema.Types.ObjectId, ref: "Account", default: null },
     updated_by: { type: Schema.Types.ObjectId, ref: "Account", default: null },
     deleted_at: { type: Date, default: null },
