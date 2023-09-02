@@ -285,13 +285,6 @@ const customerService = {
         },
       ],
     ]);
-    // return await Payment.find({
-    //   account_id: new ObjectId(account_id),
-    //   deleted_by: { $eq: null },
-    // })
-    //   .sort({ [sorter?.value || "createdAt"]: sorter?.state || -1 })
-    //   .populate("event_id")
-    //   .populate("account_id");
   },
 
   checkCustomer: async (email) => {
