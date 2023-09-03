@@ -298,7 +298,7 @@ const customerService = {
     return await Customer.findOne({
       email: email,
       deleted_by: { $eq: null },
-    });
+    }).lean();
   },
   addAttendeCustomer: async (body) => {
     try {

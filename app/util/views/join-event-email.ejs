@@ -3,7 +3,7 @@
     <style>
       body {
         padding: 10%;
-        text-align: center;
+        text-align: start;
       }
 
       .card-2 {
@@ -33,20 +33,21 @@
 
   <body>
     <div class="card card-2">
+      <h1 style="transform: scaleY(1.14); transform-origin: 0 0">
+        {{ title }}
+      </h1>
+      <p>{{ text }}</p>
+      <hr />
       <center>
-        <div style="width: 99%; background: black; padding: 5px">
-          <img style="background: black" src="../images/Eventsrack-black.png" />
+        <div style="width: 99%; padding: 5px">
+          <img src="cid:myImg" height="200px" />
         </div>
-        <hr />
-        <h1 style="transform: scaleY(1.14); transform-origin: 0 0">
-          <%= title %>
-        </h1>
-        <p><%= heading1 %></p>
-        <!-- <p>
-          <a href="<%= link %>">
-            <button><%= btnText %></button>
+
+        <p>
+          <a href="{{ link }}">
+            <button>{{ buttonText }}</button>
           </a>
-        </p> -->
+        </p>
       </center>
     </div>
   </body>

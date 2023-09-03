@@ -358,10 +358,10 @@ const accountService = {
           ...body,
           account_id: addedUser?._id,
         });
-
-        return await customerService.getCustomerEmail(email);
+        const newdata = await customerService.getCustomerEmail(email);
+        return { ...newdata, new: true };
       } else {
-        return customerExist;
+        return { ...customerExist };
       }
     } catch (error) {
       error.status = "BAD_REQUEST";

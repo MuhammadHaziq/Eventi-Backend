@@ -2,6 +2,7 @@ const Event = require("../../models/events");
 const JoinedEvent = require("../../models/joinedEvents");
 const Attendess = require("../../models/attendess");
 const attendeService = require("../../services/attendess/attendeServices");
+const { sendJoinEventMail } = require("./sendJoineventMail");
 const {
   uploadImages,
   removeFiles,
@@ -441,6 +442,7 @@ const eventService = {
     try {
       let newUsers = [];
       let insertEventCustomers = [];
+
       if (status === "Approved") {
         const addPayment = new Payment({
           account_id: customer_id,
@@ -453,6 +455,7 @@ const eventService = {
         });
         await addPayment.save();
         if (JSON.parse(attendess)?.length > 0) {
+          const eventDetail = await eventService.getEvent({ eventId });
           for (const attendi of JSON.parse(attendess)) {
             newUsers.push(
               await attendeService.addAttendeAccount({
@@ -469,8 +472,10 @@ const eventService = {
               event_status: status,
               approved_by: new ObjectId(authAccount),
             });
+            sendJoinEventMail(item, eventDetail);
           });
         }
+
         return await Event.updateOne(
           { _id: new ObjectId(eventId) },
           {

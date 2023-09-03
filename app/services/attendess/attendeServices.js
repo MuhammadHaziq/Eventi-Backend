@@ -65,7 +65,7 @@ const attendeService = {
           event_id: body.event_id,
         });
         const attende = await addAttende.save();
-        return await accountService.addAttendeUser({
+        const newUser = await accountService.addAttendeUser({
           first_name: body.first_name,
           last_name: body.last_name,
           email: body.email,
@@ -76,6 +76,7 @@ const attendeService = {
           gender: "Other",
           password: "12345678",
         });
+        return { ...newUser };
       } else {
         return await customerService.getCustomerEmail(body.email);
       }
