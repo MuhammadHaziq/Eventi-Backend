@@ -293,5 +293,54 @@ const customerService = {
       deleted_by: { $eq: null },
     }).count();
   },
+
+  getCustomerEmail: async (email) => {
+    return await Customer.findOne({
+      email: email,
+      deleted_by: { $eq: null },
+    }).lean();
+  },
+  addAttendeCustomer: async (body) => {
+    try {
+      const {
+        first_name,
+        last_name,
+        business_name,
+        email,
+        address,
+        age_verification,
+        phone_number,
+        gender,
+        date_of_birth,
+        user_type,
+        password,
+        account_id,
+        attende_id,
+      } = body;
+      /** Add Customer In Customer Schema*/
+      const addCustomer = new Customer({
+        account_id: account_id,
+        first_name: first_name,
+        last_name: last_name,
+        email: email,
+        password: password,
+        user_type: user_type || "customer",
+        business_name: business_name,
+        address: address,
+        age_verification: age_verification,
+        phone_number: phone_number,
+        gender: gender,
+        date_of_birth: date_of_birth,
+        attende_id: attende_id,
+      });
+      return await addCustomer.save();
+    } catch (err) {
+      error.status = "VALIDATION_ERR";
+      error.message = `Customer Not Created (${
+        err?.keyValue ? Object.values(err?.keyValue) : err.message
+      }) ${err?.code === 11000 ? "Already Exist" : ""}`;
+      throw error;
+    }
+  },
 };
 module.exports = customerService;

@@ -1,6 +1,8 @@
 const Event = require("../../models/events");
 const JoinedEvent = require("../../models/joinedEvents");
 const Attendess = require("../../models/attendess");
+const attendeService = require("../../services/attendess/attendeServices");
+const { sendJoinEventMail } = require("./sendJoineventMail");
 const {
   uploadImages,
   removeFiles,
@@ -438,6 +440,9 @@ const eventService = {
       no_of_tickets_sold,
     } = body;
     try {
+      let newUsers = [];
+      let insertEventCustomers = [];
+
       if (status === "Approved") {
         const addPayment = new Payment({
           account_id: customer_id,
@@ -450,38 +455,49 @@ const eventService = {
         });
         await addPayment.save();
         if (JSON.parse(attendess)?.length > 0) {
-          await Attendess.insertMany(
-            JSON.parse(attendess)?.map((item) => {
-              return { ...item, event_id: eventId };
-            })
-          );
+          const eventDetail = await eventService.getEvent({ eventId });
+          for (const attendi of JSON.parse(attendess)) {
+            newUsers.push(
+              await attendeService.addAttendeAccount({
+                ...attendi,
+                event_id: eventId,
+              })
+            );
+          }
+          newUsers?.map((item) => {
+            insertEventCustomers.push({
+              customer_id: new ObjectId(item?.account_id),
+              points_available:
+                points_available / (JSON.parse(attendess)?.length || 1),
+              event_status: status,
+              approved_by: new ObjectId(authAccount),
+            });
+            sendJoinEventMail(item, eventDetail);
+          });
         }
+
         return await Event.updateOne(
           { _id: new ObjectId(eventId) },
           {
             no_of_tickets_sold: no_of_tickets_sold || 1,
             $push: {
-              joined_customers: {
-                customer_id: new ObjectId(customer_id),
-                points_available: points_available,
-                event_status: status,
-                approved_by: new ObjectId(authAccount),
-              },
+              joined_customers: { $each: insertEventCustomers },
             },
           }
         );
-        // return await Event.findOneAndUpdate(
+        // return await Event.updateOne(
+        //   { _id: new ObjectId(eventId) },
         //   {
-        //     _id: new ObjectId(eventId),
-        //     "joined_customers.customer_id": new ObjectId(customer_id),
-        //   },
-        //   {
-        //     $set: {
-        //       "joined_customers.$.event_status": status,
-        //       "joined_customers.$.approved_by": new ObjectId(authAccount),
+        //     no_of_tickets_sold: no_of_tickets_sold || 1,
+        //     $push: {
+        //       joined_customers: {
+        //         customer_id: new ObjectId(customer_id),
+        //         points_available: points_available,
+        //         event_status: status,
+        //         approved_by: new ObjectId(authAccount),
+        //       },
         //     },
-        //   },
-        //   { upsert: true }
+        //   }
         // );
       }
     } catch (err) {

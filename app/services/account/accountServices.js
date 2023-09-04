@@ -346,6 +346,29 @@ const accountService = {
       .lean();
     return data?.user_type;
   },
+
+  addAttendeUser: async (body) => {
+    try {
+      const { email } = body;
+      /** Add Customer In Customer Schema*/
+      const customerExist = await customerService.getCustomerEmail(email);
+      if (!customerExist) {
+        const addedUser = await newUser(body);
+        await customerService.addAttendeCustomer({
+          ...body,
+          account_id: addedUser?._id,
+        });
+        const newdata = await customerService.getCustomerEmail(email);
+        return { ...newdata, new: true };
+      } else {
+        return { ...customerExist };
+      }
+    } catch (error) {
+      error.status = "BAD_REQUEST";
+      error.message = error.message;
+      throw error;
+    }
+  },
 };
 
 module.exports = accountService;
