@@ -8,8 +8,8 @@ let transport = nodemailer.createTransport({
   port: 465,
   secure: true,
   auth: {
-    user: process.env.EMAIL_APP_USER,
-    pass: process.env.EMAIL_APP_PASSWORD,
+    user: "haseebtanveer456@gmail.com",
+    pass: "sfserhphcjrzwdbc",
   },
 });
 const handlebarOptions = {
@@ -26,8 +26,8 @@ transport.use("compile", hbs(handlebarOptions));
 
 const generateAndSendEmail = async (data) => {
   const mailOptions = {
-    from: process.env.FROM_EMAIL, // Sender address
-    to: `${data?.to}`, // List of recipients
+    from: "haseebtanveer456@gmail.com", // Sender address
+    to: data?.to, // List of recipients
     subject: data?.subject, // Subject line
     template: "join-event-email",
     context: {
