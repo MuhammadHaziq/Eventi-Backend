@@ -473,7 +473,6 @@ const eventService = {
               approved_by: new ObjectId(authAccount),
             });
             if (index > 0) {
-              console.log(newUsers, "newUsers");
               const addChildPayment = new Payment({
                 account_id: new ObjectId(item?.account_id),
                 event_id: eventId,
