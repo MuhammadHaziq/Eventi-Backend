@@ -453,7 +453,7 @@ const eventService = {
           payment_id: payment_id,
           updated_by: authAccount,
         });
-        await addPayment.save();
+        const parentPayment = await addPayment.save();
         if (JSON.parse(attendess)?.length > 0) {
           const eventDetail = await eventService.getEvent({ eventId });
           for (const attendi of JSON.parse(attendess)) {
@@ -464,7 +464,7 @@ const eventService = {
               })
             );
           }
-          newUsers?.map((item) => {
+          newUsers?.map(async (item, index) => {
             insertEventCustomers.push({
               customer_id: new ObjectId(item?.account_id),
               points_available:
@@ -472,6 +472,19 @@ const eventService = {
               event_status: status,
               approved_by: new ObjectId(authAccount),
             });
+            if (index > 0) {
+              const addChildPayment = new Payment({
+                account_id: new ObjectId(item?.account_id),
+                event_id: eventId,
+                amount: amount / (JSON.parse(attendess)?.length || 1),
+                payment_method: payment_method,
+                currency: currency,
+                payment_id: payment_id,
+                payment_ref_id: parentPayment?._id,
+                updated_by: authAccount,
+              });
+              await addChildPayment.save();
+            }
             sendJoinEventMail(item, eventDetail);
           });
         }

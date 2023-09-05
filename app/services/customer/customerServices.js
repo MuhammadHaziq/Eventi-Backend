@@ -237,17 +237,13 @@ const customerService = {
     const sorter = sort ? JSON.parse(sort) : null;
     return await Payment.aggregate([
       [
+        { $match: { account_id: new ObjectId(account_id) } },
         {
           $lookup: {
             from: "attendesses",
             localField: "event_id",
             foreignField: "event_id",
             as: "attendes",
-          },
-        },
-        {
-          $match: {
-            "attendes.account_id": new ObjectId(account_id),
           },
         },
         {

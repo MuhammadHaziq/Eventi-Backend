@@ -81,7 +81,7 @@ const EventSchema = new Schema(
         },
       },
     ],
-    special_request: { type: String, trim: true },
+    special_request: { type: String, trim: true, default: null },
     created_by: { type: Schema.Types.ObjectId, ref: "Account", required: true },
     updated_by: { type: Schema.Types.ObjectId, ref: "Account", default: null },
     deleted_by: { type: Schema.Types.ObjectId, ref: "Account", default: null },

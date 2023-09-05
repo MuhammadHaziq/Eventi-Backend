@@ -22,7 +22,9 @@ const ProductSchema = new Schema(
       ref: "Account",
       required: true,
     },
-    product_images: [{ type: String, required: false, trim: true }],
+    product_images: [
+      { type: String, required: false, trim: true, default: null },
+    ],
     created_by: { type: Schema.Types.ObjectId, ref: "Account", required: true },
     updated_by: { type: Schema.Types.ObjectId, ref: "Account", default: null },
     deleted_by: { type: Schema.Types.ObjectId, ref: "Account", default: null },
@@ -33,4 +35,3 @@ const ProductSchema = new Schema(
   }
 );
 module.exports = mongoose.model("Product", ProductSchema);
- 
