@@ -5,6 +5,7 @@ const EventSchema = new Schema(
   {
     event_name: { type: String, required: true, trim: true, index: true },
     amount: { type: String, required: true, trim: true, index: true },
+    add_point: { type: String, required: true, trim: true, index: true },
     event_start_date: { type: String, required: true, default: null },
     event_end_date: { type: String, required: true, default: null },
     event_location: { type: String, required: true, trim: true },
