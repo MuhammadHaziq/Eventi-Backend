@@ -52,7 +52,7 @@ const mobileAppService = {
       deleted_at: { $eq: null },
     }).populate("products.product_id");
     const products = [];
-    console.log(response);
+    
     if (response) {
       response.map((joinedEvent) => {
         return joinedEvent.products.map((product) => {
@@ -98,7 +98,7 @@ const mobileAppService = {
         customer_name: `${customer.first_name} ${customer.last_name}`,
         customer_email: customer.email,
         customer_phone: customer.phone_number,
-        customer_pooints_available: joined_customer.points_available,
+        customer_points_available: joined_customer.points_available,
       };
       return data;
     } else {
