@@ -5,6 +5,7 @@ const EventSchema = new Schema(
   {
     event_name: { type: String, required: true, trim: true, index: true },
     amount: { type: String, required: true, trim: true, index: true },
+    add_point: { type: String, required: true, trim: true, index: true },
     event_start_date: { type: String, required: true, default: null },
     event_end_date: { type: String, required: true, default: null },
     event_location: { type: String, required: true, trim: true },
@@ -81,7 +82,7 @@ const EventSchema = new Schema(
         },
       },
     ],
-    special_request: { type: String, trim: true },
+    special_request: { type: String, trim: true, default: null },
     created_by: { type: Schema.Types.ObjectId, ref: "Account", required: true },
     updated_by: { type: Schema.Types.ObjectId, ref: "Account", default: null },
     deleted_by: { type: Schema.Types.ObjectId, ref: "Account", default: null },
