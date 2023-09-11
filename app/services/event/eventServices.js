@@ -7,7 +7,7 @@ const {
   uploadImages,
   removeFiles,
   removeAllFiles,
-} = require("../../../utils/fileHandler");
+} = require("../../../utils/fileHandler"); 
 const Payment = require("../../models/payment");
 const ObjectId = require("mongoose").Types.ObjectId;
 const error = new Error();
@@ -56,6 +56,7 @@ const eventService = {
       event_start_date,
       event_end_date,
       amount,
+      add_event_point,
       event_location,
       type_of_event,
       points_percent,
@@ -74,7 +75,7 @@ const eventService = {
         event_start_date,
         event_end_date,
         amount,
-        add_point,
+        add_event_point,
         points_percent,
         event_location,
         type_of_event,
@@ -184,7 +185,7 @@ const eventService = {
       event_start_date,
       event_end_date,
       amount,
-      add_point,
+      add_event_point,
       points_percent,
       event_location,
       type_of_event,
@@ -221,7 +222,7 @@ const eventService = {
           event_start_date,
           event_end_date,
           amount,
-          add_point,
+          add_event_point,
           points_percent,
           event_location,
           banner_images: images,
@@ -331,13 +332,7 @@ const eventService = {
 
   updateCustomerPoints: async (body) => {
     const { accountId, eventId, points_available } = body;
-    console.log(
-      {
-        _id: new ObjectId(eventId),
-        "joined_customers.customer_id": new ObjectId(accountId),
-      },
-      points_available
-    );
+   
     return await Event.updateOne(
       {
         _id: new ObjectId(eventId),

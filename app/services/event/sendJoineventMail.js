@@ -2,6 +2,8 @@ const { generateAndSendEmail } = require("../../util/joinEventEmail");
 
 module.exports = {
   sendJoinEventMail: async (item, eventDetail) => {
+    console.log("1 Sent Join Event Email----------------", item)
+    console.log("2 Sent Join Event Email----------------",eventDetail)
     return generateAndSendEmail({
       to: item?.email,
       subject: `Welcome To ${eventDetail?.event_name} Event`,
@@ -19,6 +21,9 @@ module.exports = {
           }`,
       link: `${process.env.CLIENT_URL}#/join-event/${item?.account_id}/${eventDetail?._id}`,
       buttonText: "Check Event Detail",
+      accountId:item?.account_id,
+      eventId:eventDetail?._id,
     });
   },
 };
+ 

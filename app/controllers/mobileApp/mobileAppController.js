@@ -72,4 +72,25 @@ module.exports = {
     }
   },
 
+  getCustomerConsumePoints: async (req, res) => {
+    try {
+      const body = {
+        ...req.body,
+        user_type: req.user.user_type,
+        authAccount: req.account_id
+      };
+      const response = await mobileAppService.consumeCustomerPoints(body);
+      if (response && Object.keys(response).length > 0)
+        return helper.apiResponse(
+          res,
+          false,
+          "Customer Points Consumed Fetch Successfully",
+          response
+        );
+      return helper.apiResponse(res, true, "No Customer Data Found", null);
+    } catch (err) {
+      const statusCode = err.status || "INTERNAL_SERVER_ERROR";
+      return helper.apiResponse(res, true, err.message, null, statusCode);
+    }
+  },
 };

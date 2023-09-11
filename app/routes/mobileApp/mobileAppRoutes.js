@@ -5,6 +5,7 @@ const authMiddleware = require("../../middleware/authMiddleware");
 
 router.route("/events/:vendor_id").get(authMiddleware, mobileAppController.getVendorEvents);
 router.route("/customer/:event_id/:customer_id").get(authMiddleware, mobileAppController.getCustomer);
+router.route("/customerConsumePoints").post(authMiddleware, mobileAppController.getCustomerConsumePoints);
 router.route("/products/:event_id/:vendor_id").get(authMiddleware, mobileAppController.getVendorEventProducts);
 
 module.exports = {

@@ -5,7 +5,7 @@ const EventSchema = new Schema(
   {
     event_name: { type: String, required: true, trim: true, index: true },
     amount: { type: String, required: true, trim: true, index: true },
-    add_point: { type: String, required: true, trim: true, index: true },
+    add_event_point: { type: String, required: true, trim: true, index: true },
     event_start_date: { type: String, required: true, default: null },
     event_end_date: { type: String, required: true, default: null },
     event_location: { type: String, required: true, trim: true },
@@ -41,6 +41,7 @@ const EventSchema = new Schema(
           default: null,
         },
         points_available: { type: Number, required: true, default: 0 },
+        customer_consumed_point: { type: Number, required: true, default: 0 },
         event_status: {
           type: String,
           enum: [

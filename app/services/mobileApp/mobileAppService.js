@@ -1,6 +1,8 @@
 const ObjectId = require("mongoose").Types.ObjectId;
 const Events = require("../../models/events");
+const Orders = require("../../models/order");
 const JoinedEvents = require("../../models/joinedEvents");
+ 
 
 const error = new Error();
 error.status = "NOT_FOUND";
@@ -98,12 +100,82 @@ const mobileAppService = {
         customer_name: `${customer.first_name} ${customer.last_name}`,
         customer_email: customer.email,
         customer_phone: customer.phone_number,
-        customer_pooints_available: joined_customer.points_available,
+        customer_points_available: joined_customer.points_available,
+        customer_points_consumed: joined_customer.customer_consumed_point,
       };
       return data;
     } else {
       return null;
     }
   },
+  consumeCustomerPoints: async (body) => {
+    try {
+      const { 
+        event_id, 
+        customer_id, 
+        pointsConsumed, items_order } = body;
+      
+      const itemOrderData = {
+        event_id,
+        customer_id,
+        consumed_points: pointsConsumed,
+       items_order
+      }
+
+      const itemOrderObj = new Orders(itemOrderData)
+      console.log(itemOrderObj)
+      await itemOrderObj.save();
+
+      const response = await Events.findOne({
+        _id: new ObjectId(event_id),
+        "joined_customers.customer_id": new ObjectId(customer_id),
+        event_start_date: { $lte: getCurrentDate() },
+        event_end_date: { $gte: getCurrentDate() },
+        deleted_at: { $eq: null },
+      })
+        .populate("joined_customers.customer_id")
+        .lean();
+  
+      if (response) {
+        const joined_customer_data = JSON.parse(JSON.stringify(response.joined_customers));
+        const customerIndex = joined_customer_data.findIndex(customer => customer.customer_id._id == customer_id);
+        if (customerIndex !== -1) {
+          console.log(customerIndex)
+          const customer = joined_customer_data[customerIndex];
+  
+          if (customer.points_available === customer.customer_consumed_point) {
+            return "No more points available";
+          } else {
+            customer.customer_consumed_point = parseInt(customer.customer_consumed_point) + parseInt(pointsConsumed);
+            console.log(customer);
+  
+            // Update the original data in the array customerIndex=0
+            joined_customer_data[customerIndex] = customer;
+  
+            // Update the database with the modified array
+            const data = await Events.updateOne(
+              {
+                _id: new ObjectId(event_id)
+              },
+              {
+                $set: {
+                  "joined_customers": joined_customer_data,
+                },
+              },
+              { upsert: true, new: true }
+            );
+            return "Data updated successfully";
+          }
+        } else {
+          return "Customer not found in the event";
+        }
+      } else {
+        return "No data found for the event";
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  
 };
 module.exports = mobileAppService;
