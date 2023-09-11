@@ -19,7 +19,7 @@ const EventSchema = new Schema(
       type: Number,
       required: true,
       default: 0,
-      min: 1,
+      min: 0,
       max: 100,
     },
     no_of_tickets: {

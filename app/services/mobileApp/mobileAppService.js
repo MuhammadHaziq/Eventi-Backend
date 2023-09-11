@@ -54,7 +54,7 @@ const mobileAppService = {
       deleted_at: { $eq: null },
     }).populate("products.product_id");
     const products = [];
-    console.log(response);
+    
     if (response) {
       response.map((joinedEvent) => {
         return joinedEvent.products.map((product) => {
