@@ -123,7 +123,6 @@ const mobileAppService = {
       }
 
       const itemOrderObj = new Orders(itemOrderData)
-      console.log(itemOrderObj)
       await itemOrderObj.save();
 
       const response = await Events.findOne({
@@ -140,15 +139,12 @@ const mobileAppService = {
         const joined_customer_data = JSON.parse(JSON.stringify(response.joined_customers));
         const customerIndex = joined_customer_data.findIndex(customer => customer.customer_id._id == customer_id);
         if (customerIndex !== -1) {
-          console.log(customerIndex)
           const customer = joined_customer_data[customerIndex];
   
           if (customer.points_available === customer.customer_consumed_point) {
             return "No more points available";
           } else {
             customer.customer_consumed_point = parseInt(customer.customer_consumed_point) + parseInt(pointsConsumed);
-            console.log(customer);
-  
             // Update the original data in the array customerIndex=0
             joined_customer_data[customerIndex] = customer;
   
